@@ -1,0 +1,324 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cubefs.io/schemas/volume.json",
+  "title": "CubeFS Volume",
+  "description": "Schema for CubeFS volume configuration and status. Volumes are the top-level storage namespaces in CubeFS that can be accessed via POSIX, HDFS, or S3-compatible interfaces. Each volume owns a set of data partitions and metadata partitions distributed across the cluster.",
+  "type": "object",
+  "required": ["name", "owner", "capacity"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique name identifying the volume within the CubeFS cluster. Also used as the S3 bucket name.",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_\\-\\.]*$"
+    },
+    "owner": {
+      "type": "string",
+      "description": "User ID that owns this volume. The owner has full control permissions.",
+      "minLength": 1
+    },
+    "capacity": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Total storage capacity allocated to this volume in gigabytes."
+    },
+    "replicaNum": {
+      "type": "integer",
+      "enum": [1, 2, 3],
+      "default": 3,
+      "description": "Replication factor for data partitions. Replicated volumes only. 3 is the standard for high availability."
+    },
+    "volType": {
+      "type": "integer",
+      "enum": [0, 1],
+      "default": 0,
+      "description": "Volume type. 0 for replicated volumes; 1 for erasure-coded (EC) volumes."
+    },
+    "mpCount": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 3,
+      "description": "Initial number of metadata partitions to create. Each metadata partition stores inode and directory entry data."
+    },
+    "dpCount": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 10,
+      "description": "Initial number of data partitions to create. Data partitions store the actual file data blocks."
+    },
+    "followerRead": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether follower replicas can serve read requests. Enabling this improves read throughput at the cost of potentially serving slightly stale data."
+    },
+    "enablePosixAcl": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether POSIX access control lists are enabled on this volume. Required for multi-user POSIX permission support."
+    },
+    "qosEnable": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether quality of service throttling is enabled on this volume to limit bandwidth and IOPS."
+    },
+    "status": {
+      "type": "integer",
+      "enum": [0, 1],
+      "description": "Current volume status. 0 means normal and active; 1 means marked for deletion."
+    },
+    "createTime": {
+      "type": "string",
+      "description": "Timestamp when the volume was created."
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional human-readable description of the volume's purpose."
+    },
+    "dataPartitions": {
+      "type": "array",
+      "description": "List of data partitions belonging to this volume.",
+      "items": { "$ref": "#/$defs/DataPartition" }
+    },
+    "metaPartitions": {
+      "type": "array",
+      "description": "List of metadata partitions belonging to this volume.",
+      "items": { "$ref": "#/$defs/MetaPartition" }
+    },
+    "usedSize": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Currently used storage in bytes."
+    },
+    "totalSize": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total allocated storage capacity in bytes."
+    }
+  },
+  "$defs": {
+    "DataPartition": {
+      "type": "object",
+      "description": "A data partition within a CubeFS volume that stores actual file data blocks.",
+      "required": ["partitionID"],
+      "properties": {
+        "partitionID": {
+          "type": "integer",
+          "description": "Unique identifier for this data partition."
+        },
+        "status": {
+          "type": "integer",
+          "description": "Partition status. 1 is read-write; 2 is read-only; 3 is unavailable."
+        },
+        "replicaNum": {
+          "type": "integer",
+          "description": "Number of replicas for this partition."
+        },
+        "hosts": {
+          "type": "array",
+          "description": "List of data node addresses hosting replicas of this partition.",
+          "items": {
+            "type": "string",
+            "description": "Data node address in host:port format."
+          }
+        },
+        "isRecover": {
+          "type": "boolean",
+          "description": "Whether this partition is currently in a recovery state."
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total capacity of this partition in bytes."
+        },
+        "used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Used capacity of this partition in bytes."
+        },
+        "path": {
+          "type": "string",
+          "description": "Disk path on the data node where this partition's data is stored."
+        }
+      }
+    },
+    "MetaPartition": {
+      "type": "object",
+      "description": "A metadata partition within a CubeFS volume that stores inode and directory entry data.",
+      "required": ["partitionID"],
+      "properties": {
+        "partitionID": {
+          "type": "integer",
+          "description": "Unique identifier for this metadata partition."
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Start of the inode number range managed by this partition."
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "End of the inode number range managed by this partition."
+        },
+        "inodeCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Current number of inodes stored in this partition."
+        },
+        "maxInodeID": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "The highest inode ID currently allocated in this partition."
+        },
+        "isRecover": {
+          "type": "boolean",
+          "description": "Whether this metadata partition is currently recovering."
+        },
+        "hosts": {
+          "type": "array",
+          "description": "List of metadata node addresses hosting this partition.",
+          "items": {
+            "type": "string",
+            "description": "Metadata node address in host:port format."
+          }
+        },
+        "leader": {
+          "type": "string",
+          "description": "Address of the current raft leader for this partition."
+        }
+      }
+    },
+    "User": {
+      "type": "object",
+      "description": "A CubeFS user account with S3 credentials and volume ownership.",
+      "required": ["user_id"],
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "Unique user identifier within the CubeFS cluster.",
+          "minLength": 1
+        },
+        "access_key": {
+          "type": "string",
+          "description": "S3-compatible access key for authenticating object storage requests.",
+          "minLength": 16
+        },
+        "secret_key": {
+          "type": "string",
+          "description": "S3-compatible secret key for signing object storage requests.",
+          "minLength": 32
+        },
+        "own_vols": {
+          "type": "array",
+          "description": "List of volume names that this user owns.",
+          "items": {
+            "type": "string",
+            "description": "Volume name."
+          }
+        },
+        "authorized_vols": {
+          "type": "object",
+          "description": "Map of volume names to access permission levels granted to this user.",
+          "additionalProperties": {
+            "type": "string",
+            "enum": ["READONLY", "RO", "READWRITE", "RW", "NONE"],
+            "description": "Permission level on the volume."
+          }
+        },
+        "user_type": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "User type. 0 for normal user; 1 for admin user with cluster-wide privileges."
+        },
+        "create_time": {
+          "type": "string",
+          "description": "Timestamp when the user account was created."
+        }
+      }
+    },
+    "DataNode": {
+      "type": "object",
+      "description": "A CubeFS data node that stores data partition replicas.",
+      "required": ["addr"],
+      "properties": {
+        "addr": {
+          "type": "string",
+          "description": "Network address of the data node in host:port format.",
+          "pattern": "^[^:]+:[0-9]+$"
+        },
+        "status": {
+          "type": "boolean",
+          "description": "Whether this node is currently active and healthy."
+        },
+        "isWritable": {
+          "type": "boolean",
+          "description": "Whether this node can accept new data partition allocations."
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique numeric identifier assigned to this node by the Master."
+        },
+        "totalWeight": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total storage capacity of this node in bytes."
+        },
+        "usedWeight": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Used storage on this node in bytes."
+        },
+        "availableSpace": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Available storage remaining on this node in bytes."
+        },
+        "dataPartitionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of data partitions currently hosted on this node."
+        }
+      }
+    },
+    "MetaNode": {
+      "type": "object",
+      "description": "A CubeFS metadata node that stores metadata partition data.",
+      "required": ["addr"],
+      "properties": {
+        "addr": {
+          "type": "string",
+          "description": "Network address of the metadata node in host:port format.",
+          "pattern": "^[^:]+:[0-9]+$"
+        },
+        "status": {
+          "type": "boolean",
+          "description": "Whether this node is currently active and healthy."
+        },
+        "isWritable": {
+          "type": "boolean",
+          "description": "Whether this node can accept new metadata partition allocations."
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique numeric identifier assigned to this node by the Master."
+        },
+        "totalWeight": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total memory or storage capacity of this node in bytes."
+        },
+        "usedWeight": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Used memory or storage on this node in bytes."
+        },
+        "metaPartitionCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of metadata partitions currently hosted on this node."
+        }
+      }
+    }
+  }
+}

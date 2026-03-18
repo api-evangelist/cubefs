@@ -1,0 +1,238 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "cubefs": "https://cubefs.io/vocab#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "cncf": "https://www.cncf.io/projects/",
+
+    "Volume": {
+      "@id": "cubefs:Volume",
+      "@context": {
+        "name": "dcterms:title",
+        "owner": {
+          "@id": "cubefs:owner",
+          "@type": "@id"
+        },
+        "capacity": {
+          "@id": "cubefs:capacity",
+          "@type": "xsd:integer"
+        },
+        "replicaNum": {
+          "@id": "cubefs:replicaNum",
+          "@type": "xsd:integer"
+        },
+        "volType": "cubefs:volumeType",
+        "status": "cubefs:volumeStatus",
+        "createTime": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "usedSize": {
+          "@id": "cubefs:usedSize",
+          "@type": "xsd:integer"
+        },
+        "totalSize": {
+          "@id": "cubefs:totalSize",
+          "@type": "xsd:integer"
+        },
+        "dataPartitions": {
+          "@id": "cubefs:dataPartitions",
+          "@container": "@set"
+        },
+        "metaPartitions": {
+          "@id": "cubefs:metaPartitions",
+          "@container": "@set"
+        }
+      },
+      "rdfs:label": "CubeFS Volume",
+      "rdfs:comment": "A CubeFS volume, the top-level storage namespace supporting POSIX, HDFS, and S3-compatible access protocols.",
+      "skos:broader": "schema:Dataset",
+      "skos:exactMatch": "schema:StorageObject"
+    },
+
+    "DataPartition": {
+      "@id": "cubefs:DataPartition",
+      "@context": {
+        "partitionID": {
+          "@id": "cubefs:partitionID",
+          "@type": "xsd:integer"
+        },
+        "status": "cubefs:partitionStatus",
+        "replicaNum": {
+          "@id": "cubefs:replicaNum",
+          "@type": "xsd:integer"
+        },
+        "hosts": {
+          "@id": "cubefs:replicaHosts",
+          "@container": "@set"
+        },
+        "total": {
+          "@id": "cubefs:totalBytes",
+          "@type": "xsd:integer"
+        },
+        "used": {
+          "@id": "cubefs:usedBytes",
+          "@type": "xsd:integer"
+        }
+      },
+      "rdfs:label": "Data Partition",
+      "rdfs:comment": "A CubeFS data partition that stores replicated data blocks across data nodes.",
+      "skos:broader": "cubefs:Volume"
+    },
+
+    "MetaPartition": {
+      "@id": "cubefs:MetaPartition",
+      "@context": {
+        "partitionID": {
+          "@id": "cubefs:partitionID",
+          "@type": "xsd:integer"
+        },
+        "start": {
+          "@id": "cubefs:inodeRangeStart",
+          "@type": "xsd:integer"
+        },
+        "end": {
+          "@id": "cubefs:inodeRangeEnd",
+          "@type": "xsd:integer"
+        },
+        "inodeCount": {
+          "@id": "cubefs:inodeCount",
+          "@type": "xsd:integer"
+        },
+        "hosts": {
+          "@id": "cubefs:replicaHosts",
+          "@container": "@set"
+        },
+        "leader": {
+          "@id": "cubefs:raftLeader",
+          "@type": "@id"
+        }
+      },
+      "rdfs:label": "Metadata Partition",
+      "rdfs:comment": "A CubeFS metadata partition that stores inode and directory entry data across metadata nodes.",
+      "skos:broader": "cubefs:Volume"
+    },
+
+    "DataNode": {
+      "@id": "cubefs:DataNode",
+      "@context": {
+        "addr": {
+          "@id": "schema:url",
+          "@type": "@id"
+        },
+        "status": "cubefs:nodeStatus",
+        "isWritable": "cubefs:isWritable",
+        "totalWeight": {
+          "@id": "cubefs:totalBytes",
+          "@type": "xsd:integer"
+        },
+        "usedWeight": {
+          "@id": "cubefs:usedBytes",
+          "@type": "xsd:integer"
+        },
+        "availableSpace": {
+          "@id": "cubefs:availableBytes",
+          "@type": "xsd:integer"
+        },
+        "dataPartitionCount": {
+          "@id": "cubefs:partitionCount",
+          "@type": "xsd:integer"
+        }
+      },
+      "rdfs:label": "Data Node",
+      "rdfs:comment": "A CubeFS storage node that hosts data partition replicas on local disk.",
+      "skos:broader": "schema:ComputerServer",
+      "skos:related": "cubefs:DataPartition"
+    },
+
+    "MetaNode": {
+      "@id": "cubefs:MetaNode",
+      "@context": {
+        "addr": {
+          "@id": "schema:url",
+          "@type": "@id"
+        },
+        "status": "cubefs:nodeStatus",
+        "isWritable": "cubefs:isWritable",
+        "totalWeight": {
+          "@id": "cubefs:totalBytes",
+          "@type": "xsd:integer"
+        },
+        "usedWeight": {
+          "@id": "cubefs:usedBytes",
+          "@type": "xsd:integer"
+        },
+        "metaPartitionCount": {
+          "@id": "cubefs:partitionCount",
+          "@type": "xsd:integer"
+        }
+      },
+      "rdfs:label": "Metadata Node",
+      "rdfs:comment": "A CubeFS node that stores and manages metadata partitions containing file system inodes and directory entries.",
+      "skos:broader": "schema:ComputerServer",
+      "skos:related": "cubefs:MetaPartition"
+    },
+
+    "User": {
+      "@id": "cubefs:User",
+      "@context": {
+        "user_id": "dcterms:identifier",
+        "access_key": "cubefs:accessKey",
+        "secret_key": "cubefs:secretKey",
+        "own_vols": {
+          "@id": "cubefs:ownedVolumes",
+          "@container": "@set"
+        },
+        "authorized_vols": "cubefs:authorizedVolumes",
+        "user_type": "cubefs:userType",
+        "create_time": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        }
+      },
+      "rdfs:label": "CubeFS User",
+      "rdfs:comment": "A CubeFS user account with S3-compatible credentials and volume ownership/access rights.",
+      "skos:broader": "schema:Person",
+      "skos:related": "cubefs:Volume"
+    },
+
+    "Cluster": {
+      "@id": "cubefs:Cluster",
+      "@context": {
+        "Name": "dcterms:title",
+        "LeaderAddr": {
+          "@id": "cubefs:leaderAddress",
+          "@type": "@id"
+        },
+        "DataNodes": {
+          "@id": "cubefs:dataNodes",
+          "@container": "@set"
+        },
+        "MetaNodes": {
+          "@id": "cubefs:metaNodes",
+          "@container": "@set"
+        }
+      },
+      "rdfs:label": "CubeFS Cluster",
+      "rdfs:comment": "A CubeFS distributed storage cluster comprising data nodes, metadata nodes, and managed volumes.",
+      "skos:broader": "schema:SoftwareApplication",
+      "skos:exactMatch": "cncf:cubefs"
+    },
+
+    "name": "dcterms:title",
+    "description": "dcterms:description",
+    "created": {
+      "@id": "dcterms:created",
+      "@type": "xsd:dateTime"
+    },
+    "modified": {
+      "@id": "dcterms:modified",
+      "@type": "xsd:dateTime"
+    },
+    "id": "dcterms:identifier"
+  }
+}

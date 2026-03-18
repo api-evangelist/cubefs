@@ -1,0 +1,1385 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master API
+  description: >-
+    The CubeFS Master API provides HTTP endpoints for administering a CubeFS
+    distributed storage cluster. The Master node is the control plane for all
+    cluster operations including volume lifecycle management, data and metadata
+    node administration, user and access key management, and cluster health
+    monitoring. All endpoints are served over HTTP on the Master node's
+    listen port (default 17010) and accept query string parameters. Responses
+    are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/
+servers:
+  - url: http://{masterHost}:{masterPort}
+    description: CubeFS Master node HTTP API server
+    variables:
+      masterHost:
+        default: 127.0.0.1
+        description: IP address or hostname of the CubeFS Master node.
+      masterPort:
+        default: '17010'
+        description: Listening port of the CubeFS Master node.
+tags:
+  - name: Cluster
+    description: >-
+      Cluster-level operations including retrieving cluster status, topology,
+      and freezing/unfreezing the cluster to control automatic partition creation.
+  - name: Volumes
+    description: >-
+      Volume lifecycle management operations including creating, updating,
+      expanding, shrinking, and deleting volumes. Volumes are the top-level
+      storage namespaces in CubeFS.
+  - name: DataNodes
+    description: >-
+      Data node management operations including listing nodes, querying node
+      status, decommissioning nodes, and managing data partitions on nodes.
+  - name: MetaNodes
+    description: >-
+      Metadata node management operations including listing nodes, querying
+      node status, decommissioning nodes, and managing metadata partitions.
+  - name: Users
+    description: >-
+      User and access control management for CubeFS multi-tenancy. Users own
+      volumes and are assigned access keys and secret keys for S3-compatible
+      object storage operations.
+  - name: DataPartitions
+    description: >-
+      Data partition management including creating, loading, decommissioning,
+      and diagnosing data partitions within volumes.
+  - name: MetaPartitions
+    description: >-
+      Metadata partition management including creating, loading, and
+      decommissioning metadata partitions within volumes.
+paths:
+  /admin/getCluster:
+    get:
+      operationId: getCluster
+      summary: Get cluster information
+      description: >-
+        Returns comprehensive information about the CubeFS cluster including
+        the list of data nodes, metadata nodes, and volumes. Also returns
+        cluster-wide space statistics including total, used, and available
+        capacity across all nodes.
+      tags:
+        - Cluster
+      responses:
+        '200':
+          description: Cluster information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterInfoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /cluster/stat:
+    get:
+      operationId: getClusterStat
+      summary: Get cluster statistics
+      description: >-
+        Returns space usage statistics for the CubeFS cluster broken down by
+        region. Includes TotalGB, UsedGB, IncreaseGB, UsedRatio metrics for
+        both data nodes and metadata nodes.
+      tags:
+        - Cluster
+      responses:
+        '200':
+          description: Cluster statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClusterStatResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /cluster/freeze:
+    get:
+      operationId: freezeCluster
+      summary: Freeze or unfreeze the cluster
+      description: >-
+        Freezes or unfreezes the cluster. When frozen, volumes will no longer
+        automatically create data or metadata partitions. This is used during
+        maintenance operations to prevent new partition creation.
+      tags:
+        - Cluster
+      parameters:
+        - name: enable
+          in: query
+          required: true
+          description: Set to true to freeze the cluster or false to unfreeze it.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+      responses:
+        '200':
+          description: Cluster freeze state updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /admin/createVol:
+    get:
+      operationId: createVolume
+      summary: Create a volume
+      description: >-
+        Creates a new CubeFS volume with the specified configuration. Volumes
+        are the top-level namespace for storing data. When created, CubeFS
+        allocates 10 data partitions and 3 metadata partitions by default.
+        If no user matching the owner ID exists, a new user is automatically
+        created with that ID. The volume can be configured for replication or
+        erasure coding.
+      tags:
+        - Volumes
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Unique name for the new volume.
+          schema:
+            type: string
+        - name: capacity
+          in: query
+          required: true
+          description: Capacity of the volume in GB.
+          schema:
+            type: integer
+            minimum: 1
+        - name: owner
+          in: query
+          required: true
+          description: User ID that owns this volume. Creates the user if they do not exist.
+          schema:
+            type: string
+        - name: mpCount
+          in: query
+          required: false
+          description: Initial number of metadata partitions. Defaults to 3.
+          schema:
+            type: integer
+            minimum: 1
+        - name: dpCount
+          in: query
+          required: false
+          description: Initial number of data partitions. Defaults to 10.
+          schema:
+            type: integer
+            minimum: 1
+        - name: replicaNum
+          in: query
+          required: false
+          description: Replication factor for data partitions. Defaults to 3.
+          schema:
+            type: integer
+            enum:
+              - 1
+              - 2
+              - 3
+        - name: followerRead
+          in: query
+          required: false
+          description: Whether follower replicas can serve read requests.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: enablePosixAcl
+          in: query
+          required: false
+          description: Whether POSIX ACL is enabled for this volume.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: volType
+          in: query
+          required: false
+          description: Volume type. 0 for replicated, 1 for erasure coded.
+          schema:
+            type: integer
+            enum:
+              - 0
+              - 1
+        - name: qosEnable
+          in: query
+          required: false
+          description: Whether QoS (quality of service) throttling is enabled.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+      responses:
+        '200':
+          description: Volume created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /admin/getVol:
+    get:
+      operationId: getVolume
+      summary: Get volume information
+      description: >-
+        Returns detailed information about a specific volume including its
+        name, owner, capacity, replication configuration, data partition list,
+        metadata partition list, and current status.
+      tags:
+        - Volumes
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Name of the volume to retrieve.
+          schema:
+            type: string
+        - name: authKey
+          in: query
+          required: true
+          description: MD5 of the owner's user ID for authentication.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Volume information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolumeInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /admin/listVols:
+    get:
+      operationId: listVolumes
+      summary: List volumes
+      description: >-
+        Returns a list of all volumes in the cluster. The results can be
+        filtered by keyword to match volume names containing the specified
+        substring.
+      tags:
+        - Volumes
+      parameters:
+        - name: keywords
+          in: query
+          required: false
+          description: Substring filter for volume names.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Volume list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolumeListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /vol/update:
+    get:
+      operationId: updateVolume
+      summary: Update volume configuration
+      description: >-
+        Updates configuration parameters for an existing volume including
+        capacity, replication settings, QoS parameters, follower read policy,
+        and access control settings.
+      tags:
+        - Volumes
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Name of the volume to update.
+          schema:
+            type: string
+        - name: authKey
+          in: query
+          required: true
+          description: MD5 of the owner's user ID for authentication.
+          schema:
+            type: string
+        - name: capacity
+          in: query
+          required: false
+          description: New capacity in GB for the volume.
+          schema:
+            type: integer
+            minimum: 1
+        - name: followerRead
+          in: query
+          required: false
+          description: Enable or disable follower reads.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+        - name: replicaNum
+          in: query
+          required: false
+          description: New replication factor for the volume.
+          schema:
+            type: integer
+        - name: enablePosixAcl
+          in: query
+          required: false
+          description: Enable or disable POSIX ACL.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+      responses:
+        '200':
+          description: Volume updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /vol/delete:
+    get:
+      operationId: deleteVolume
+      summary: Delete a volume
+      description: >-
+        Marks a volume for deletion. The volume is first logically deleted by
+        setting its status to deleted, then all data and metadata partitions
+        are asynchronously removed via periodic tasks. Erasure-coded volumes
+        can only be deleted when their used size is 0.
+      tags:
+        - Volumes
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Name of the volume to delete.
+          schema:
+            type: string
+        - name: authKey
+          in: query
+          required: true
+          description: MD5 of the owner's user ID for authentication.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Volume deletion initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /vol/expand:
+    get:
+      operationId: expandVolume
+      summary: Expand volume capacity
+      description: >-
+        Expands the storage capacity of a volume to the specified size in GB.
+        The new capacity must be larger than the current capacity. CubeFS
+        will automatically allocate additional data partitions as needed.
+      tags:
+        - Volumes
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Name of the volume to expand.
+          schema:
+            type: string
+        - name: authKey
+          in: query
+          required: true
+          description: MD5 of the owner's user ID for authentication.
+          schema:
+            type: string
+        - name: capacity
+          in: query
+          required: true
+          description: New capacity in GB. Must be greater than current capacity.
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Volume expansion initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /dataNode/add:
+    get:
+      operationId: addDataNode
+      summary: Add a data node
+      description: >-
+        Registers a new data node with the cluster at the specified address.
+        The data node must already be running and accessible at the given
+        address before it can be added to the cluster.
+      tags:
+        - DataNodes
+      parameters:
+        - name: addr
+          in: query
+          required: true
+          description: Address of the data node in host:port format.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data node added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /dataNode/get:
+    get:
+      operationId: getDataNode
+      summary: Get data node information
+      description: >-
+        Returns detailed information about a specific data node including its
+        address, status, available capacity, used capacity, data partition list,
+        and disk information.
+      tags:
+        - DataNodes
+      parameters:
+        - name: addr
+          in: query
+          required: true
+          description: Address of the data node in host:port format.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data node information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataNodeInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /dataNode/decommission:
+    get:
+      operationId: decommissionDataNode
+      summary: Decommission a data node
+      description: >-
+        Removes a data node from the cluster. All data partitions on the node
+        are asynchronously migrated to other available data nodes before the
+        node is fully removed. This is a safe operation for draining a node
+        during maintenance or replacement.
+      tags:
+        - DataNodes
+      parameters:
+        - name: addr
+          in: query
+          required: true
+          description: Address of the data node to decommission in host:port format.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data node decommission initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /metaNode/add:
+    get:
+      operationId: addMetaNode
+      summary: Add a metadata node
+      description: >-
+        Registers a new metadata node with the cluster at the specified address.
+        The metadata node must already be running and accessible before it
+        can join the cluster.
+      tags:
+        - MetaNodes
+      parameters:
+        - name: addr
+          in: query
+          required: true
+          description: Address of the metadata node in host:port format.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata node added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /metaNode/get:
+    get:
+      operationId: getMetaNode
+      summary: Get metadata node information
+      description: >-
+        Returns detailed information about a specific metadata node including
+        its address, status, memory usage, metadata partition list, and
+        available capacity.
+      tags:
+        - MetaNodes
+      parameters:
+        - name: addr
+          in: query
+          required: true
+          description: Address of the metadata node in host:port format.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata node information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaNodeInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /metaNode/decommission:
+    get:
+      operationId: decommissionMetaNode
+      summary: Decommission a metadata node
+      description: >-
+        Removes a metadata node from the cluster. All metadata partitions on
+        the node are asynchronously migrated to other available metadata nodes
+        before the node is fully removed.
+      tags:
+        - MetaNodes
+      parameters:
+        - name: addr
+          in: query
+          required: true
+          description: Address of the metadata node to decommission in host:port format.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata node decommission initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/create:
+    post:
+      operationId: createUser
+      summary: Create a user
+      description: >-
+        Creates a new CubeFS user for multi-tenancy and object storage access.
+        Users can be assigned an access key and secret key for S3-compatible
+        API operations. User types include normal (0) and admin (1).
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '200':
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /user/delete:
+    get:
+      operationId: deleteUser
+      summary: Delete a user
+      description: >-
+        Removes a user from the CubeFS cluster. The user must not own any
+        volumes before deletion. All access permissions associated with the
+        user are also removed.
+      tags:
+        - Users
+      parameters:
+        - name: user
+          in: query
+          required: true
+          description: User ID to delete.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/info:
+    get:
+      operationId: getUserInfo
+      summary: Get user information
+      description: >-
+        Returns detailed information about a specific user including their
+        access key, secret key, list of owned volumes, and volume permissions.
+      tags:
+        - Users
+      parameters:
+        - name: user
+          in: query
+          required: true
+          description: User ID to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/list:
+    get:
+      operationId: listUsers
+      summary: List users
+      description: >-
+        Returns a list of all users in the CubeFS cluster. Results can be
+        filtered by keyword to match user IDs containing the specified substring.
+      tags:
+        - Users
+      parameters:
+        - name: keywords
+          in: query
+          required: false
+          description: Substring filter for user IDs.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /user/updatePolicy:
+    post:
+      operationId: updateUserPolicy
+      summary: Update user volume permissions
+      description: >-
+        Grants or revokes a user's access permissions on a specific volume.
+        Permission values are READONLY (read-only access), READWRITE (full
+        read/write access), or NONE (removes all permissions).
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserPolicyRequest'
+      responses:
+        '200':
+          description: User policy updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /dataPartition/create:
+    get:
+      operationId: createDataPartition
+      summary: Create a data partition
+      description: >-
+        Manually creates a data partition for a specific volume. This is
+        typically done automatically by the Master when volume usage exceeds
+        thresholds, but can be triggered manually when the cluster is frozen
+        or for operational purposes.
+      tags:
+        - DataPartitions
+      parameters:
+        - name: count
+          in: query
+          required: true
+          description: Number of data partitions to create.
+          schema:
+            type: integer
+            minimum: 1
+        - name: name
+          in: query
+          required: true
+          description: Name of the volume to create data partitions for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data partitions created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /dataPartition/decommission:
+    get:
+      operationId: decommissionDataPartition
+      summary: Decommission a data partition
+      description: >-
+        Migrates a specific data partition from a given data node to another
+        available data node. Used to drain a node before decommissioning or
+        to rebalance data distribution.
+      tags:
+        - DataPartitions
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID of the data partition to decommission.
+          schema:
+            type: integer
+        - name: addr
+          in: query
+          required: true
+          description: Address of the data node hosting the partition to migrate away from.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data partition decommission initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /metaPartition/create:
+    get:
+      operationId: createMetaPartition
+      summary: Create a metadata partition
+      description: >-
+        Manually creates a metadata partition for a specific volume. This is
+        typically triggered when existing metadata partitions approach their
+        inode count limits, but can also be done manually.
+      tags:
+        - MetaPartitions
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: Name of the volume to create metadata partitions for.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata partition created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /metaPartition/decommission:
+    get:
+      operationId: decommissionMetaPartition
+      summary: Decommission a metadata partition
+      description: >-
+        Migrates a metadata partition from a given metadata node to another
+        available node. Used to drain a metadata node before decommissioning
+        or to rebalance metadata distribution.
+      tags:
+        - MetaPartitions
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: ID of the metadata partition to decommission.
+          schema:
+            type: integer
+        - name: addr
+          in: query
+          required: true
+          description: Address of the metadata node hosting the partition.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata partition decommission initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  responses:
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: A resource with this name or ID already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
+    ClusterInfoResponse:
+      type: object
+      description: Cluster information response including nodes and volumes.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: object
+          description: Cluster information data.
+          properties:
+            Name:
+              type: string
+              description: Name of the CubeFS cluster.
+            LeaderAddr:
+              type: string
+              description: Address of the current Master leader node.
+            DisableAutoAlloc:
+              type: boolean
+              description: Whether automatic partition allocation is disabled (frozen).
+            Applied:
+              type: integer
+              description: Raft applied index.
+            MaxDataPartitionID:
+              type: integer
+              description: Maximum data partition ID allocated so far.
+            MaxMetaPartitionID:
+              type: integer
+              description: Maximum metadata partition ID allocated so far.
+            DataNodeStatInfo:
+              $ref: '#/components/schemas/NodeStatInfo'
+            MetaNodeStatInfo:
+              $ref: '#/components/schemas/NodeStatInfo'
+            VolStatInfo:
+              type: array
+              description: Status summary of all volumes.
+              items:
+                $ref: '#/components/schemas/VolStatInfo'
+            DataNodes:
+              type: array
+              description: List of data nodes in the cluster.
+              items:
+                $ref: '#/components/schemas/NodeView'
+            MetaNodes:
+              type: array
+              description: List of metadata nodes in the cluster.
+              items:
+                $ref: '#/components/schemas/NodeView'
+    ClusterStatResponse:
+      type: object
+      description: Cluster space statistics response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: object
+          description: Space statistics broken down by region.
+          properties:
+            DataNodeStatInfo:
+              $ref: '#/components/schemas/NodeStatInfo'
+            MetaNodeStatInfo:
+              $ref: '#/components/schemas/NodeStatInfo'
+    NodeStatInfo:
+      type: object
+      description: Space usage statistics for a set of nodes.
+      properties:
+        TotalGB:
+          type: number
+          description: Total storage capacity in gigabytes.
+        UsedGB:
+          type: number
+          description: Used storage in gigabytes.
+        IncreaseGB:
+          type: number
+          description: Storage increase since last measurement in gigabytes.
+        UsedRatio:
+          type: string
+          description: Ratio of used to total storage as a decimal string.
+    VolStatInfo:
+      type: object
+      description: Storage statistics for a single volume.
+      properties:
+        Name:
+          type: string
+          description: Name of the volume.
+        TotalSize:
+          type: integer
+          description: Total allocated capacity in bytes.
+        UsedSize:
+          type: integer
+          description: Used storage in bytes.
+        UsedRatio:
+          type: string
+          description: Ratio of used to total capacity.
+        CacheTotalSize:
+          type: integer
+          description: Total cache tier capacity in bytes.
+        CacheUsedSize:
+          type: integer
+          description: Used cache tier storage in bytes.
+        EnableToken:
+          type: boolean
+          description: Whether token-based access control is enabled.
+    NodeView:
+      type: object
+      description: Summary view of a data or metadata node.
+      properties:
+        Addr:
+          type: string
+          description: Address of the node in host:port format.
+        Status:
+          type: boolean
+          description: Whether the node is currently active and healthy.
+        IsWritable:
+          type: boolean
+          description: Whether the node can accept write operations.
+        ID:
+          type: integer
+          description: Unique identifier of the node.
+    VolumeInfoResponse:
+      type: object
+      description: Detailed volume information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          $ref: '#/components/schemas/VolumeInfo'
+    VolumeListResponse:
+      type: object
+      description: List of volumes response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: array
+          description: List of volume summary objects.
+          items:
+            $ref: '#/components/schemas/VolumeView'
+    VolumeView:
+      type: object
+      description: Summary view of a CubeFS volume.
+      properties:
+        Name:
+          type: string
+          description: Name of the volume.
+        Owner:
+          type: string
+          description: User ID that owns the volume.
+        CreateTime:
+          type: string
+          description: Volume creation timestamp.
+        Status:
+          type: integer
+          description: Volume status. 0 is normal, 1 is marked for deletion.
+        TotalSize:
+          type: integer
+          description: Total capacity allocated to the volume in bytes.
+        UsedSize:
+          type: integer
+          description: Amount of storage used in bytes.
+        DpCnt:
+          type: integer
+          description: Number of data partitions.
+        MpCnt:
+          type: integer
+          description: Number of metadata partitions.
+    VolumeInfo:
+      type: object
+      description: Detailed information about a CubeFS volume.
+      properties:
+        Name:
+          type: string
+          description: Name of the volume.
+        Owner:
+          type: string
+          description: User ID that owns the volume.
+        Capacity:
+          type: integer
+          description: Total configured capacity in GB.
+        ReplicaNum:
+          type: integer
+          description: Replication factor for data partitions.
+        FollowerRead:
+          type: boolean
+          description: Whether follower replicas can serve reads.
+        Status:
+          type: integer
+          description: Volume status. 0 is normal, 1 is marked for deletion.
+        EnablePosixAcl:
+          type: boolean
+          description: Whether POSIX ACL is enabled.
+        VolType:
+          type: integer
+          description: Volume type. 0 for replicated, 1 for erasure coded.
+        DataPartitions:
+          type: array
+          description: List of data partitions belonging to this volume.
+          items:
+            $ref: '#/components/schemas/DataPartitionView'
+        MetaPartitions:
+          type: array
+          description: List of metadata partitions belonging to this volume.
+          items:
+            $ref: '#/components/schemas/MetaPartitionView'
+    DataPartitionView:
+      type: object
+      description: Summary of a data partition.
+      properties:
+        PartitionID:
+          type: integer
+          description: Unique partition identifier.
+        Status:
+          type: integer
+          description: Partition status.
+        ReplicaNum:
+          type: integer
+          description: Number of replicas for this partition.
+        Hosts:
+          type: array
+          description: Data nodes hosting replicas of this partition.
+          items:
+            type: string
+            description: Node address in host:port format.
+    MetaPartitionView:
+      type: object
+      description: Summary of a metadata partition.
+      properties:
+        PartitionID:
+          type: integer
+          description: Unique partition identifier.
+        Start:
+          type: integer
+          description: Start of the inode range for this partition.
+        End:
+          type: integer
+          description: End of the inode range for this partition.
+        InodeCount:
+          type: integer
+          description: Current number of inodes in this partition.
+        MaxInodeID:
+          type: integer
+          description: Highest inode ID in this partition.
+        IsRecover:
+          type: boolean
+          description: Whether this partition is currently recovering.
+        Hosts:
+          type: array
+          description: Metadata nodes hosting this partition.
+          items:
+            type: string
+            description: Node address in host:port format.
+    DataNodeInfoResponse:
+      type: object
+      description: Detailed data node information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: object
+          description: Data node details.
+          properties:
+            Addr:
+              type: string
+              description: Address of the data node.
+            Status:
+              type: boolean
+              description: Whether the node is active.
+            TotalWeight:
+              type: integer
+              description: Total storage capacity in bytes.
+            UsedWeight:
+              type: integer
+              description: Used storage in bytes.
+            AvailableSpace:
+              type: integer
+              description: Available storage in bytes.
+            DataPartitionCount:
+              type: integer
+              description: Number of data partitions on this node.
+            DataPartitionReports:
+              type: array
+              description: Reports for each data partition on this node.
+              items:
+                type: object
+                description: Data partition report from this node.
+    MetaNodeInfoResponse:
+      type: object
+      description: Detailed metadata node information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: object
+          description: Metadata node details.
+          properties:
+            Addr:
+              type: string
+              description: Address of the metadata node.
+            Status:
+              type: boolean
+              description: Whether the node is active.
+            TotalWeight:
+              type: integer
+              description: Total memory/storage capacity.
+            UsedWeight:
+              type: integer
+              description: Used memory/storage.
+            MetaPartitionCount:
+              type: integer
+              description: Number of metadata partitions on this node.
+    CreateUserRequest:
+      type: object
+      description: Request body for creating a CubeFS user.
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: Unique user identifier.
+        password:
+          type: string
+          description: Optional password for the user.
+        accessKey:
+          type: string
+          description: Optional S3 access key for object storage. Generated automatically if omitted.
+        secretKey:
+          type: string
+          description: Optional S3 secret key. Generated automatically if omitted.
+        userType:
+          type: integer
+          enum:
+            - 0
+            - 1
+          description: User type. 0 for normal user, 1 for admin user.
+    UpdateUserPolicyRequest:
+      type: object
+      description: Request body for updating user volume permissions.
+      required:
+        - user_id
+        - volume
+        - policy
+      properties:
+        user_id:
+          type: string
+          description: User ID to update permissions for.
+        volume:
+          type: string
+          description: Name of the volume to update permissions on.
+        policy:
+          type: string
+          enum:
+            - READONLY
+            - RO
+            - READWRITE
+            - RW
+            - NONE
+          description: >-
+            Permission level to grant. READONLY/RO grants read-only access;
+            READWRITE/RW grants full read/write access; NONE removes all access.
+    UserInfoResponse:
+      type: object
+      description: User information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          $ref: '#/components/schemas/UserInfo'
+    UserListResponse:
+      type: object
+      description: List of users response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: array
+          description: List of user objects.
+          items:
+            $ref: '#/components/schemas/UserInfo'
+    UserInfo:
+      type: object
+      description: CubeFS user account information.
+      properties:
+        user_id:
+          type: string
+          description: Unique user identifier.
+        access_key:
+          type: string
+          description: S3-compatible access key for object storage authentication.
+        secret_key:
+          type: string
+          description: S3-compatible secret key for object storage authentication.
+        own_vols:
+          type: array
+          description: List of volume names owned by this user.
+          items:
+            type: string
+            description: Volume name.
+        authorized_vols:
+          type: object
+          description: Map of volume names to permission levels for volumes the user has access to.
+          additionalProperties:
+            type: string
+            description: Permission level such as READONLY or READWRITE.
+        user_type:
+          type: integer
+          description: User type. 0 for normal, 1 for admin.
+        create_time:
+          type: string
+          description: User creation timestamp.

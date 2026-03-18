@@ -16,7 +16,7 @@ tags:
 - Cloud Native
 - Graduated
 created: '2026-03-16'
-modified: '2026-03-16'
+modified: '2026-03-18'
 specificationVersion: '0.19'
 type: Index
 apis:
@@ -32,6 +32,10 @@ apis:
   properties:
   - type: Documentation
     url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: OpenAPI
+    url: openapi/cubefs-s3-api-openapi.yml
   tags:
   - S3
   - Object Storage
@@ -48,17 +52,48 @@ apis:
   properties:
   - type: Documentation
     url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: OpenAPI
+    url: openapi/cubefs-master-api-openapi.yml
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
   tags:
   - Admin API
   - Cluster Management
+  - Control Plane
 common:
+- type: JSON-LD
+  url: json-ld/cubefs-context.jsonld
+  name: CubeFS JSON-LD Context
+  description: Linked data context mapping CubeFS resources to standard vocabularies.
+- type: JSONSchema
+  url: json-schema/cubefs-volume-schema.json
+  name: CubeFS Volume JSON Schema
+  description: JSON Schema for CubeFS volume, partition, node, and user data models.
+- type: Website
+  name: CubeFS Website
+  description: Official CubeFS project website.
+  url: https://cubefs.io/
 - type: Documentation
   name: CubeFS Documentation
   description: Official documentation for CubeFS.
   url: https://cubefs.io/docs/master/overview/introduction.html
-- type: GitHubOrg
-  name: CubeFS GitHub
-  description: Source code repository.
+- type: Getting Started
+  name: CubeFS Quick Start
+  description: Quick start guide for deploying CubeFS.
+  url: https://cubefs.io/docs/master/quickstart/single-deploy.html
+- type: Change Log
+  name: CubeFS Changelog
+  description: Version history and changelog for CubeFS releases.
+  url: https://github.com/cubefs/cubefs/blob/master/CHANGELOG.md
+- type: GitHub Organization
+  name: CubeFS GitHub Organization
+  description: GitHub organization hosting all CubeFS source code.
+  url: https://github.com/cubefs
+- type: GitHubRepository
+  name: CubeFS GitHub Repository
+  description: Main CubeFS source code repository.
   url: https://github.com/cubefs/cubefs
 maintainers:
 - FN: Kin Lane

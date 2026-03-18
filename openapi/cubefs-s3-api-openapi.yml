@@ -1,0 +1,826 @@
+openapi: 3.1.0
+info:
+  title: CubeFS S3-Compatible API
+  description: >-
+    The CubeFS ObjectNode provides an S3-compatible object storage interface
+    that allows applications using AWS S3 SDKs and tools to interact with
+    CubeFS storage without modification. The ObjectNode listens on port 17410
+    by default and supports standard S3 operations including bucket creation
+    and deletion, object CRUD, multipart uploads, access control lists (ACLs),
+    and pre-signed URL generation. Authentication uses AWS Signature Version 4
+    with access keys and secret keys managed by the CubeFS Master API.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+externalDocs:
+  description: CubeFS ObjectNode Documentation
+  url: https://cubefs.io/docs/master/user-guide/objectnode.html
+servers:
+  - url: http://{objectNodeHost}:{objectNodePort}
+    description: CubeFS ObjectNode S3-compatible API server
+    variables:
+      objectNodeHost:
+        default: 127.0.0.1
+        description: IP address or hostname of the CubeFS ObjectNode.
+      objectNodePort:
+        default: '17410'
+        description: Listening port of the CubeFS ObjectNode.
+tags:
+  - name: Buckets
+    description: >-
+      Bucket-level operations including creating, listing, and deleting buckets.
+      In CubeFS, each S3 bucket corresponds to a CubeFS volume. Bucket names
+      must be unique within the cluster.
+  - name: Objects
+    description: >-
+      Object CRUD operations including uploading, downloading, copying, listing,
+      and deleting objects. Supports both standard single-part uploads and
+      multipart uploads for large objects.
+  - name: Multipart
+    description: >-
+      Multipart upload operations for uploading large objects in parts.
+      Supports initiating, uploading parts, listing parts, completing, and
+      aborting multipart uploads.
+  - name: ACLs
+    description: >-
+      Access control list operations for buckets and objects. Supports
+      getting and setting ACLs to control access at the bucket and object level.
+security:
+  - awsAuth: []
+paths:
+  /:
+    get:
+      operationId: listBuckets
+      summary: List buckets
+      description: >-
+        Returns a list of all buckets owned by the authenticated user. Each
+        bucket corresponds to a CubeFS volume. The response includes the bucket
+        name and creation date.
+      tags:
+        - Buckets
+      responses:
+        '200':
+          description: Bucket list retrieved successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListAllMyBucketsResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /{bucket}:
+    put:
+      operationId: createBucket
+      summary: Create a bucket
+      description: >-
+        Creates a new S3 bucket, which corresponds to creating a new CubeFS
+        volume. The bucket name becomes the volume name. The request may include
+        a LocationConstraint to specify the storage region.
+      tags:
+        - Buckets
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+      requestBody:
+        required: false
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CreateBucketConfiguration'
+      responses:
+        '200':
+          description: Bucket created successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    head:
+      operationId: headBucket
+      summary: Check if a bucket exists
+      description: >-
+        Checks whether a bucket exists and the caller has permission to access
+        it. Returns 200 if the bucket exists and is accessible, 404 if it does
+        not exist, or 403 if access is denied.
+      tags:
+        - Buckets
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+      responses:
+        '200':
+          description: Bucket exists and is accessible.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteBucket
+      summary: Delete a bucket
+      description: >-
+        Deletes an empty S3 bucket. The bucket must be empty before deletion.
+        Attempting to delete a non-empty bucket returns a 409 BucketNotEmpty error.
+      tags:
+        - Buckets
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+      responses:
+        '204':
+          description: Bucket deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    get:
+      operationId: listObjects
+      summary: List objects in a bucket
+      description: >-
+        Returns a list of objects in a bucket. Supports prefix filtering,
+        delimiter-based grouping for simulating directory hierarchies, and
+        pagination via continuation tokens. Returns up to 1000 objects
+        per request by default.
+      tags:
+        - Objects
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - name: prefix
+          in: query
+          required: false
+          description: Only return objects whose keys begin with this prefix.
+          schema:
+            type: string
+        - name: delimiter
+          in: query
+          required: false
+          description: >-
+            Character used to group keys. Keys with the same string between the
+            prefix and the first occurrence of the delimiter are grouped under
+            a common prefix.
+          schema:
+            type: string
+        - name: max-keys
+          in: query
+          required: false
+          description: Maximum number of objects to return. Defaults to 1000.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+        - name: continuation-token
+          in: query
+          required: false
+          description: Continuation token for paginating through large result sets.
+          schema:
+            type: string
+        - name: list-type
+          in: query
+          required: false
+          description: Set to 2 to use the List Objects V2 format with continuation tokens.
+          schema:
+            type: integer
+            enum:
+              - 2
+      responses:
+        '200':
+          description: Object list retrieved successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListBucketResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /{bucket}/{key}:
+    put:
+      operationId: putObject
+      summary: Upload an object
+      description: >-
+        Uploads an object to the specified bucket at the given key path.
+        The object data is provided in the request body. The Content-Type
+        and Content-Length headers should be set appropriately. Server-side
+        encryption, metadata, and ACL settings can be specified via headers.
+      tags:
+        - Objects
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+        - name: Content-Type
+          in: header
+          required: false
+          description: MIME type of the object being uploaded.
+          schema:
+            type: string
+        - name: Content-MD5
+          in: header
+          required: false
+          description: Base64-encoded MD5 digest of the request body for integrity verification.
+          schema:
+            type: string
+        - name: x-amz-acl
+          in: header
+          required: false
+          description: Canned ACL to apply to the object.
+          schema:
+            type: string
+            enum:
+              - private
+              - public-read
+              - public-read-write
+              - authenticated-read
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              description: Binary content of the object to upload.
+      responses:
+        '200':
+          description: Object uploaded successfully.
+          headers:
+            ETag:
+              description: Entity tag (MD5 hash) of the uploaded object.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      operationId: getObject
+      summary: Download an object
+      description: >-
+        Downloads the content of an object from the specified bucket at the
+        given key. Supports range requests for partial content downloads and
+        conditional requests based on ETag or modification time.
+      tags:
+        - Objects
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+        - name: Range
+          in: header
+          required: false
+          description: Byte range for partial content download, e.g. bytes=0-1023.
+          schema:
+            type: string
+        - name: If-Match
+          in: header
+          required: false
+          description: Only return the object if its ETag matches.
+          schema:
+            type: string
+        - name: If-Modified-Since
+          in: header
+          required: false
+          description: Only return the object if it was modified after this date.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Object downloaded successfully.
+          headers:
+            Content-Type:
+              description: MIME type of the object.
+              schema:
+                type: string
+            ETag:
+              description: Entity tag of the object.
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp when the object was last modified.
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: Object content.
+        '304':
+          description: Object not modified (conditional request).
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    head:
+      operationId: headObject
+      summary: Get object metadata
+      description: >-
+        Returns metadata for the specified object without downloading its
+        content. Returns the same headers as GetObject but with an empty body.
+        Useful for checking existence, size, and ETag before downloading.
+      tags:
+        - Objects
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+      responses:
+        '200':
+          description: Object metadata retrieved successfully.
+          headers:
+            Content-Type:
+              description: MIME type of the object.
+              schema:
+                type: string
+            Content-Length:
+              description: Size of the object in bytes.
+              schema:
+                type: integer
+            ETag:
+              description: Entity tag of the object.
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp when the object was last modified.
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteObject
+      summary: Delete an object
+      description: >-
+        Deletes a single object from a bucket. The operation is idempotent —
+        deleting a non-existent object returns a 204 with no error.
+      tags:
+        - Objects
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+      responses:
+        '204':
+          description: Object deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /{bucket}/{key}?uploads:
+    post:
+      operationId: createMultipartUpload
+      summary: Initiate a multipart upload
+      description: >-
+        Initiates a multipart upload session for a large object. Returns an
+        UploadId that must be included in all subsequent part upload, list,
+        complete, and abort requests for this multipart upload.
+      tags:
+        - Multipart
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+      responses:
+        '200':
+          description: Multipart upload initiated.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InitiateMultipartUploadResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /{bucket}/{key}?uploadId={uploadId}:
+    put:
+      operationId: uploadPart
+      summary: Upload a part
+      description: >-
+        Uploads a single part in a multipart upload. Parts must be between
+        5 MB and 5 GB. The part number must be between 1 and 10,000. Returns
+        an ETag for the part that must be included when completing the upload.
+      tags:
+        - Multipart
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+        - name: uploadId
+          in: query
+          required: true
+          description: Upload ID from the CreateMultipartUpload response.
+          schema:
+            type: string
+        - name: partNumber
+          in: query
+          required: true
+          description: Part number between 1 and 10,000.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10000
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              description: Binary content of this part.
+      responses:
+        '200':
+          description: Part uploaded successfully.
+          headers:
+            ETag:
+              description: ETag of the uploaded part, required for completing the multipart upload.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: completeMultipartUpload
+      summary: Complete a multipart upload
+      description: >-
+        Assembles the previously uploaded parts and completes the multipart
+        upload. The request body must list all parts in order with their
+        part numbers and ETags. The assembled object becomes available for
+        download once this request succeeds.
+      tags:
+        - Multipart
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+        - name: uploadId
+          in: query
+          required: true
+          description: Upload ID from the CreateMultipartUpload response.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CompleteMultipartUpload'
+      responses:
+        '200':
+          description: Multipart upload completed successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CompleteMultipartUploadResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      operationId: abortMultipartUpload
+      summary: Abort a multipart upload
+      description: >-
+        Aborts an in-progress multipart upload and frees all storage consumed
+        by previously uploaded parts. After aborting, no additional parts can
+        be uploaded for this UploadId.
+      tags:
+        - Multipart
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - $ref: '#/components/parameters/key'
+        - name: uploadId
+          in: query
+          required: true
+          description: Upload ID from the CreateMultipartUpload response.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Multipart upload aborted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /{bucket}?acl:
+    get:
+      operationId: getBucketAcl
+      summary: Get bucket ACL
+      description: >-
+        Returns the access control list for the specified bucket. The ACL
+        defines which accounts or groups have read and write access to the bucket.
+      tags:
+        - ACLs
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+      responses:
+        '200':
+          description: Bucket ACL retrieved successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccessControlPolicy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: putBucketAcl
+      summary: Set bucket ACL
+      description: >-
+        Sets the access control list for the specified bucket. Supports canned
+        ACLs (private, public-read) or a custom ACL with explicit grants.
+      tags:
+        - ACLs
+      parameters:
+        - $ref: '#/components/parameters/bucket'
+        - name: x-amz-acl
+          in: header
+          required: false
+          description: Canned ACL to apply. Mutually exclusive with request body ACL.
+          schema:
+            type: string
+            enum:
+              - private
+              - public-read
+              - public-read-write
+      requestBody:
+        required: false
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessControlPolicy'
+      responses:
+        '200':
+          description: Bucket ACL set successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    awsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: >-
+        AWS Signature Version 4 authorization. Format:
+        AWS4-HMAC-SHA256 Credential={accessKey}/{date}/{region}/s3/aws4_request,
+        SignedHeaders={headers}, Signature={signature}. Access keys are managed
+        via the CubeFS Master API user management endpoints.
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: '^[a-z0-9][a-z0-9\-]*[a-z0-9]$'
+    key:
+      name: key
+      in: path
+      required: true
+      description: >-
+        Object key (path within the bucket). Use forward slashes to simulate
+        directory hierarchies.
+      schema:
+        type: string
+  responses:
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Conflict:
+      description: A conflict occurred, such as a bucket already existing or not being empty.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+  schemas:
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+    Owner:
+      type: object
+      description: Owner of a bucket or object.
+      properties:
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
+    BucketInfo:
+      type: object
+      description: Information about an S3 bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        CreationDate:
+          type: string
+          format: date-time
+          description: Timestamp when the bucket was created.
+    ListAllMyBucketsResult:
+      type: object
+      description: Result of the list buckets operation.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        Buckets:
+          type: object
+          description: Container for the bucket list.
+          properties:
+            Bucket:
+              type: array
+              description: List of bucket objects.
+              items:
+                $ref: '#/components/schemas/BucketInfo'
+    CreateBucketConfiguration:
+      type: object
+      description: Optional configuration for bucket creation.
+      properties:
+        LocationConstraint:
+          type: string
+          description: Region or zone where the bucket should be created.
+    ObjectInfo:
+      type: object
+      description: Metadata about an object in a bucket.
+      properties:
+        Key:
+          type: string
+          description: Object key.
+        LastModified:
+          type: string
+          format: date-time
+          description: Timestamp when the object was last modified.
+        ETag:
+          type: string
+          description: MD5 hash of the object content.
+        Size:
+          type: integer
+          description: Size of the object in bytes.
+        StorageClass:
+          type: string
+          description: Storage class of the object.
+        Owner:
+          $ref: '#/components/schemas/Owner'
+    CommonPrefix:
+      type: object
+      description: Common prefix resulting from delimiter-based grouping.
+      properties:
+        Prefix:
+          type: string
+          description: The common prefix string.
+    ListBucketResult:
+      type: object
+      description: Result of listing objects in a bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        Prefix:
+          type: string
+          description: Filter prefix used in the request.
+        Delimiter:
+          type: string
+          description: Delimiter used for grouping.
+        MaxKeys:
+          type: integer
+          description: Maximum number of keys returned.
+        IsTruncated:
+          type: boolean
+          description: Whether the results were truncated due to MaxKeys.
+        NextContinuationToken:
+          type: string
+          description: Token to use for the next page of results when IsTruncated is true.
+        Contents:
+          type: array
+          description: List of objects matching the request.
+          items:
+            $ref: '#/components/schemas/ObjectInfo'
+        CommonPrefixes:
+          type: array
+          description: List of common prefixes from delimiter grouping.
+          items:
+            $ref: '#/components/schemas/CommonPrefix'
+    InitiateMultipartUploadResult:
+      type: object
+      description: Result of initiating a multipart upload.
+      properties:
+        Bucket:
+          type: string
+          description: Name of the bucket.
+        Key:
+          type: string
+          description: Object key for the multipart upload.
+        UploadId:
+          type: string
+          description: Unique identifier for this multipart upload session.
+    CompletedPart:
+      type: object
+      description: A part to include when completing a multipart upload.
+      required:
+        - PartNumber
+        - ETag
+      properties:
+        PartNumber:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          description: Part number identifying this part.
+        ETag:
+          type: string
+          description: ETag returned when the part was uploaded.
+    CompleteMultipartUpload:
+      type: object
+      description: Request body for completing a multipart upload.
+      properties:
+        Part:
+          type: array
+          description: Ordered list of parts to assemble into the final object.
+          items:
+            $ref: '#/components/schemas/CompletedPart'
+    CompleteMultipartUploadResult:
+      type: object
+      description: Result of completing a multipart upload.
+      properties:
+        Location:
+          type: string
+          description: URL of the newly created object.
+        Bucket:
+          type: string
+          description: Name of the bucket.
+        Key:
+          type: string
+          description: Key of the assembled object.
+        ETag:
+          type: string
+          description: ETag of the completed object.
+    Grantee:
+      type: object
+      description: An entity to whom access is being granted.
+      properties:
+        ID:
+          type: string
+          description: User ID or group identifier.
+        DisplayName:
+          type: string
+          description: Display name of the grantee.
+        Type:
+          type: string
+          description: Type of grantee, typically CanonicalUser or Group.
+    Grant:
+      type: object
+      description: A permission grant in an ACL.
+      properties:
+        Grantee:
+          $ref: '#/components/schemas/Grantee'
+        Permission:
+          type: string
+          enum:
+            - FULL_CONTROL
+            - READ
+            - WRITE
+            - READ_ACP
+            - WRITE_ACP
+          description: Permission level granted.
+    AccessControlPolicy:
+      type: object
+      description: Access control policy for a bucket or object.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        AccessControlList:
+          type: object
+          description: Container for grant entries.
+          properties:
+            Grant:
+              type: array
+              description: List of access control grants.
+              items:
+                $ref: '#/components/schemas/Grant'
