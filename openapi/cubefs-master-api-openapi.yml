@@ -61,7 +61,7 @@ paths:
   /admin/getCluster:
     get:
       operationId: getCluster
-      summary: Get cluster information
+      summary: CubeFS Get cluster information
       description: >-
         Returns comprehensive information about the CubeFS cluster including
         the list of data nodes, metadata nodes, and volumes. Also returns
@@ -81,7 +81,7 @@ paths:
   /cluster/stat:
     get:
       operationId: getClusterStat
-      summary: Get cluster statistics
+      summary: CubeFS Get cluster statistics
       description: >-
         Returns space usage statistics for the CubeFS cluster broken down by
         region. Includes TotalGB, UsedGB, IncreaseGB, UsedRatio metrics for
@@ -100,7 +100,7 @@ paths:
   /cluster/freeze:
     get:
       operationId: freezeCluster
-      summary: Freeze or unfreeze the cluster
+      summary: CubeFS Freeze or unfreeze the cluster
       description: >-
         Freezes or unfreezes the cluster. When frozen, volumes will no longer
         automatically create data or metadata partitions. This is used during
@@ -131,7 +131,7 @@ paths:
   /admin/createVol:
     get:
       operationId: createVolume
-      summary: Create a volume
+      summary: CubeFS Create a volume
       description: >-
         Creates a new CubeFS volume with the specified configuration. Volumes
         are the top-level namespace for storing data. When created, CubeFS
@@ -235,7 +235,7 @@ paths:
   /admin/getVol:
     get:
       operationId: getVolume
-      summary: Get volume information
+      summary: CubeFS Get volume information
       description: >-
         Returns detailed information about a specific volume including its
         name, owner, capacity, replication configuration, data partition list,
@@ -271,7 +271,7 @@ paths:
   /admin/listVols:
     get:
       operationId: listVolumes
-      summary: List volumes
+      summary: CubeFS List volumes
       description: >-
         Returns a list of all volumes in the cluster. The results can be
         filtered by keyword to match volume names containing the specified
@@ -297,7 +297,7 @@ paths:
   /vol/update:
     get:
       operationId: updateVolume
-      summary: Update volume configuration
+      summary: CubeFS Update volume configuration
       description: >-
         Updates configuration parameters for an existing volume including
         capacity, replication settings, QoS parameters, follower read policy,
@@ -364,7 +364,7 @@ paths:
   /vol/delete:
     get:
       operationId: deleteVolume
-      summary: Delete a volume
+      summary: CubeFS Delete a volume
       description: >-
         Marks a volume for deletion. The volume is first logically deleted by
         setting its status to deleted, then all data and metadata partitions
@@ -401,7 +401,7 @@ paths:
   /vol/expand:
     get:
       operationId: expandVolume
-      summary: Expand volume capacity
+      summary: CubeFS Expand volume capacity
       description: >-
         Expands the storage capacity of a volume to the specified size in GB.
         The new capacity must be larger than the current capacity. CubeFS
@@ -444,7 +444,7 @@ paths:
   /dataNode/add:
     get:
       operationId: addDataNode
-      summary: Add a data node
+      summary: CubeFS Add a data node
       description: >-
         Registers a new data node with the cluster at the specified address.
         The data node must already be running and accessible at the given
@@ -472,7 +472,7 @@ paths:
   /dataNode/get:
     get:
       operationId: getDataNode
-      summary: Get data node information
+      summary: CubeFS Get data node information
       description: >-
         Returns detailed information about a specific data node including its
         address, status, available capacity, used capacity, data partition list,
@@ -502,7 +502,7 @@ paths:
   /dataNode/decommission:
     get:
       operationId: decommissionDataNode
-      summary: Decommission a data node
+      summary: CubeFS Decommission a data node
       description: >-
         Removes a data node from the cluster. All data partitions on the node
         are asynchronously migrated to other available data nodes before the
@@ -533,7 +533,7 @@ paths:
   /metaNode/add:
     get:
       operationId: addMetaNode
-      summary: Add a metadata node
+      summary: CubeFS Add a metadata node
       description: >-
         Registers a new metadata node with the cluster at the specified address.
         The metadata node must already be running and accessible before it
@@ -561,7 +561,7 @@ paths:
   /metaNode/get:
     get:
       operationId: getMetaNode
-      summary: Get metadata node information
+      summary: CubeFS Get metadata node information
       description: >-
         Returns detailed information about a specific metadata node including
         its address, status, memory usage, metadata partition list, and
@@ -591,7 +591,7 @@ paths:
   /metaNode/decommission:
     get:
       operationId: decommissionMetaNode
-      summary: Decommission a metadata node
+      summary: CubeFS Decommission a metadata node
       description: >-
         Removes a metadata node from the cluster. All metadata partitions on
         the node are asynchronously migrated to other available metadata nodes
@@ -621,7 +621,7 @@ paths:
   /user/create:
     post:
       operationId: createUser
-      summary: Create a user
+      summary: CubeFS Create a user
       description: >-
         Creates a new CubeFS user for multi-tenancy and object storage access.
         Users can be assigned an access key and secret key for S3-compatible
@@ -650,7 +650,7 @@ paths:
   /user/delete:
     get:
       operationId: deleteUser
-      summary: Delete a user
+      summary: CubeFS Delete a user
       description: >-
         Removes a user from the CubeFS cluster. The user must not own any
         volumes before deletion. All access permissions associated with the
@@ -680,7 +680,7 @@ paths:
   /user/info:
     get:
       operationId: getUserInfo
-      summary: Get user information
+      summary: CubeFS Get user information
       description: >-
         Returns detailed information about a specific user including their
         access key, secret key, list of owned volumes, and volume permissions.
@@ -709,7 +709,7 @@ paths:
   /user/list:
     get:
       operationId: listUsers
-      summary: List users
+      summary: CubeFS List users
       description: >-
         Returns a list of all users in the CubeFS cluster. Results can be
         filtered by keyword to match user IDs containing the specified substring.
@@ -734,7 +734,7 @@ paths:
   /user/updatePolicy:
     post:
       operationId: updateUserPolicy
-      summary: Update user volume permissions
+      summary: CubeFS Update user volume permissions
       description: >-
         Grants or revokes a user's access permissions on a specific volume.
         Permission values are READONLY (read-only access), READWRITE (full
@@ -763,7 +763,7 @@ paths:
   /dataPartition/create:
     get:
       operationId: createDataPartition
-      summary: Create a data partition
+      summary: CubeFS Create a data partition
       description: >-
         Manually creates a data partition for a specific volume. This is
         typically done automatically by the Master when volume usage exceeds
@@ -799,7 +799,7 @@ paths:
   /dataPartition/decommission:
     get:
       operationId: decommissionDataPartition
-      summary: Decommission a data partition
+      summary: CubeFS Decommission a data partition
       description: >-
         Migrates a specific data partition from a given data node to another
         available data node. Used to drain a node before decommissioning or
@@ -833,7 +833,7 @@ paths:
   /metaPartition/create:
     get:
       operationId: createMetaPartition
-      summary: Create a metadata partition
+      summary: CubeFS Create a metadata partition
       description: >-
         Manually creates a metadata partition for a specific volume. This is
         typically triggered when existing metadata partitions approach their
@@ -861,7 +861,7 @@ paths:
   /metaPartition/decommission:
     get:
       operationId: decommissionMetaPartition
-      summary: Decommission a metadata partition
+      summary: CubeFS Decommission a metadata partition
       description: >-
         Migrates a metadata partition from a given metadata node to another
         available node. Used to drain a metadata node before decommissioning
