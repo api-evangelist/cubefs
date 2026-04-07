@@ -27,25 +27,25 @@ servers:
         default: '17410'
         description: Listening port of the CubeFS ObjectNode.
 tags:
+  - name: ACLs
+    description: >-
+      Access control list operations for buckets and objects. Supports
+      getting and setting ACLs to control access at the bucket and object level.
   - name: Buckets
     description: >-
       Bucket-level operations including creating, listing, and deleting buckets.
       In CubeFS, each S3 bucket corresponds to a CubeFS volume. Bucket names
       must be unique within the cluster.
-  - name: Objects
-    description: >-
-      Object CRUD operations including uploading, downloading, copying, listing,
-      and deleting objects. Supports both standard single-part uploads and
-      multipart uploads for large objects.
   - name: Multipart
     description: >-
       Multipart upload operations for uploading large objects in parts.
       Supports initiating, uploading parts, listing parts, completing, and
       aborting multipart uploads.
-  - name: ACLs
+  - name: Objects
     description: >-
-      Access control list operations for buckets and objects. Supports
-      getting and setting ACLs to control access at the bucket and object level.
+      Object CRUD operations including uploading, downloading, copying, listing,
+      and deleting objects. Supports both standard single-part uploads and
+      multipart uploads for large objects.
 security:
   - awsAuth: []
 paths:

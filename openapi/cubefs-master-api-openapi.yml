@@ -31,32 +31,32 @@ tags:
     description: >-
       Cluster-level operations including retrieving cluster status, topology,
       and freezing/unfreezing the cluster to control automatic partition creation.
-  - name: Volumes
-    description: >-
-      Volume lifecycle management operations including creating, updating,
-      expanding, shrinking, and deleting volumes. Volumes are the top-level
-      storage namespaces in CubeFS.
   - name: DataNodes
     description: >-
       Data node management operations including listing nodes, querying node
       status, decommissioning nodes, and managing data partitions on nodes.
+  - name: DataPartitions
+    description: >-
+      Data partition management including creating, loading, decommissioning,
+      and diagnosing data partitions within volumes.
   - name: MetaNodes
     description: >-
       Metadata node management operations including listing nodes, querying
       node status, decommissioning nodes, and managing metadata partitions.
+  - name: MetaPartitions
+    description: >-
+      Metadata partition management including creating, loading, and
+      decommissioning metadata partitions within volumes.
   - name: Users
     description: >-
       User and access control management for CubeFS multi-tenancy. Users own
       volumes and are assigned access keys and secret keys for S3-compatible
       object storage operations.
-  - name: DataPartitions
+  - name: Volumes
     description: >-
-      Data partition management including creating, loading, decommissioning,
-      and diagnosing data partitions within volumes.
-  - name: MetaPartitions
-    description: >-
-      Metadata partition management including creating, loading, and
-      decommissioning metadata partitions within volumes.
+      Volume lifecycle management operations including creating, updating,
+      expanding, shrinking, and deleting volumes. Volumes are the top-level
+      storage namespaces in CubeFS.
 paths:
   /admin/getCluster:
     get:
