@@ -1,0 +1,27 @@
+extends: [[spectral:oas, all]]
+rules:
+  cubefs-s3-server-defined:
+    description: CubeFS S3 spec must declare a server.
+    given: $.servers
+    severity: error
+    then:
+      function: truthy
+  cubefs-s3-bucket-path:
+    description: S3 bucket-scoped operations must include {Bucket} path parameter.
+    given: $.paths
+    severity: warn
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          patternProperties:
+            "^/(\\{Bucket\\}|)":
+              type: object
+  cubefs-s3-tag-required:
+    description: S3 operations must declare a tag (Buckets, Objects, Multipart, Acl).
+    given: $.paths[*][get,post,put,delete,head]
+    severity: warn
+    then:
+      field: tags
+      function: truthy

@@ -1,0 +1,18 @@
+name: list-volumes
+description: >-
+  List all CubeFS volumes registered on the cluster with their owner,
+  capacity, partition counts, and current usage.
+api: cubefs-master-api
+operationId: listVolumes
+method: GET
+path: /admin/listVols
+inputs:
+  - name: keywords
+    in: query
+    required: false
+    description: Optional name fragment to filter the list.
+outputs:
+  - name: volumes
+    description: List of volumes with their core metadata.
+sideEffects: read-only
+authentication: cluster-admin

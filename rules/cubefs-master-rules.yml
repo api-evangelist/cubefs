@@ -1,0 +1,51 @@
+extends: [[spectral:oas, all]]
+rules:
+  cubefs-info-contact:
+    description: CubeFS API specs must declare a contact.
+    given: $.info
+    severity: warn
+    then:
+      field: contact
+      function: truthy
+  cubefs-server-defined:
+    description: CubeFS specs must declare at least one server.
+    given: $.servers
+    severity: error
+    then:
+      function: truthy
+  cubefs-master-volume-paths:
+    description: Volume admin endpoints should be under /admin or /vol prefix.
+    given: $.paths
+    severity: warn
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          patternProperties:
+            "^/(admin|vol|cluster|dataNode|metaNode|user|s3|disk|partition|raft)/":
+              type: object
+          additionalProperties: false
+  cubefs-tag-required:
+    description: Operations must declare a tag.
+    given: $.paths[*][get,post,put,delete]
+    severity: warn
+    then:
+      field: tags
+      function: truthy
+  cubefs-operation-id-camel:
+    description: Operation IDs should be camelCase.
+    given: $.paths[*][get,post,put,delete].operationId
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: '^[a-z][a-zA-Z0-9]+$'
+  cubefs-cluster-admin-name-required:
+    description: Volume create/update operations must require a vol name parameter.
+    given: $.paths[?(@property.match(/admin\/(createVol|getVol)|vol\/(update|delete|expand)/))][post,get,delete].parameters[*].name
+    severity: warn
+    then:
+      function: pattern
+      functionOptions:
+        match: '^(name|authKey|capacity|owner|mpCount|replicaNum|crossZone|enableToken|description)$'

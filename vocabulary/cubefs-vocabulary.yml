@@ -1,0 +1,33 @@
+name: CubeFS Vocabulary
+description: >-
+  Controlled terms used across the CubeFS distributed file system covering
+  cluster, volume, partition, node, and access protocols.
+terms:
+  - term: Cluster
+    definition: A CubeFS deployment composed of a master, data nodes, meta nodes, and ObjectNodes.
+  - term: Master
+    definition: Control-plane process responsible for metadata coordination and cluster management.
+  - term: DataNode
+    definition: Storage process that hosts data partitions and serves read/write to clients.
+  - term: MetaNode
+    definition: Storage process that hosts meta partitions and serves filesystem metadata operations.
+  - term: ObjectNode
+    definition: Gateway process that exposes the S3-compatible API for object storage clients.
+  - term: Volume
+    definition: A logical filesystem unit on the cluster with quota, replication, and partition layout.
+  - term: DataPartition
+    definition: A unit of data placement on data nodes; replication factor applies per partition.
+  - term: MetaPartition
+    definition: A unit of metadata placement on meta nodes; carries inode and dentry data.
+  - term: ErasureCoding
+    definition: Storage mode trading replication for parity-coded data placement to reduce overhead.
+  - term: Tenant
+    definition: An isolated user/owner namespace with policies and quota.
+  - term: AccessKey
+    definition: S3-style identifier used to sign requests against the ObjectNode.
+  - term: SecretKey
+    definition: S3-style secret paired with an access key to compute request signatures.
+  - term: PosixClient
+    definition: FUSE-based client mounting a CubeFS volume as a POSIX filesystem.
+  - term: HdfsClient
+    definition: HDFS-protocol client accessing CubeFS for analytics workloads.
