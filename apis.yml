@@ -1,6 +1,6 @@
 aid: cubefs
 url: https://raw.githubusercontent.com/api-evangelist/cubefs/refs/heads/main/apis.yml
-x-type: opensource
+kind: opensource
 name: CubeFS
 description: >-
   CubeFS is a CNCF graduated cloud-native distributed file system supporting
@@ -99,7 +99,7 @@ useCases:
   - name: Hot/Cold Tiering
     description: Replicated tier for hot data and erasure-coded tier for cold data.
 common:
-  - type: JSON-LD
+  - type: JSONLD
     url: json-ld/cubefs-context.jsonld
     name: CubeFS JSON-LD Context
     description: Linked-data context mapping CubeFS resources to standard vocabularies.
