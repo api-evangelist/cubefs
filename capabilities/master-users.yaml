@@ -1,0 +1,244 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: CubeFS Master API — Users
+  description: 'CubeFS Master API — Users. 5 operations. Lead operation: CubeFS Create a user. Self-contained Naftiko capability
+    covering one Cubefs business surface.'
+  tags:
+  - Cubefs
+  - Users
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    CUBEFS_API_KEY: CUBEFS_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: master-users
+    baseUri: http://{masterHost}:{masterPort}
+    description: CubeFS Master API — Users business capability. Self-contained, no shared references.
+    resources:
+    - name: user-create
+      path: /user/create
+      operations:
+      - name: createuser
+        method: POST
+        description: CubeFS Create a user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: user-delete
+      path: /user/delete
+      operations:
+      - name: deleteuser
+        method: GET
+        description: CubeFS Delete a user
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: user
+          in: query
+          type: string
+          description: User ID to delete.
+          required: true
+    - name: user-info
+      path: /user/info
+      operations:
+      - name: getuserinfo
+        method: GET
+        description: CubeFS Get user information
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: user
+          in: query
+          type: string
+          description: User ID to retrieve.
+          required: true
+    - name: user-list
+      path: /user/list
+      operations:
+      - name: listusers
+        method: GET
+        description: CubeFS List users
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: keywords
+          in: query
+          type: string
+          description: Substring filter for user IDs.
+    - name: user-updatePolicy
+      path: /user/updatePolicy
+      operations:
+      - name: updateuserpolicy
+        method: POST
+        description: CubeFS Update user volume permissions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+  exposes:
+  - type: rest
+    namespace: master-users-rest
+    port: 8080
+    description: REST adapter for CubeFS Master API — Users. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/user/create
+      name: user-create
+      description: REST surface for user-create.
+      operations:
+      - method: POST
+        name: createuser
+        description: CubeFS Create a user
+        call: master-users.createuser
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/delete
+      name: user-delete
+      description: REST surface for user-delete.
+      operations:
+      - method: GET
+        name: deleteuser
+        description: CubeFS Delete a user
+        call: master-users.deleteuser
+        with:
+          user: rest.user
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/info
+      name: user-info
+      description: REST surface for user-info.
+      operations:
+      - method: GET
+        name: getuserinfo
+        description: CubeFS Get user information
+        call: master-users.getuserinfo
+        with:
+          user: rest.user
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/list
+      name: user-list
+      description: REST surface for user-list.
+      operations:
+      - method: GET
+        name: listusers
+        description: CubeFS List users
+        call: master-users.listusers
+        with:
+          keywords: rest.keywords
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/user/updatepolicy
+      name: user-updatepolicy
+      description: REST surface for user-updatePolicy.
+      operations:
+      - method: POST
+        name: updateuserpolicy
+        description: CubeFS Update user volume permissions
+        call: master-users.updateuserpolicy
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: master-users-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for CubeFS Master API — Users. One tool per consumed operation, routed inline through this capability's
+      consumes block.
+    tools:
+    - name: cubefs-create-user
+      description: CubeFS Create a user
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: master-users.createuser
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-delete-user
+      description: CubeFS Delete a user
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-users.deleteuser
+      with:
+        user: tools.user
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-get-user-information
+      description: CubeFS Get user information
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-users.getuserinfo
+      with:
+        user: tools.user
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-list-users
+      description: CubeFS List users
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-users.listusers
+      with:
+        keywords: tools.keywords
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-update-user-volume-permissions
+      description: CubeFS Update user volume permissions
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: master-users.updateuserpolicy
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

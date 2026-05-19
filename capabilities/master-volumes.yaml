@@ -1,0 +1,401 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: CubeFS Master API — Volumes
+  description: 'CubeFS Master API — Volumes. 6 operations. Lead operation: CubeFS Create a volume. Self-contained Naftiko
+    capability covering one Cubefs business surface.'
+  tags:
+  - Cubefs
+  - Volumes
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    CUBEFS_API_KEY: CUBEFS_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: master-volumes
+    baseUri: http://{masterHost}:{masterPort}
+    description: CubeFS Master API — Volumes business capability. Self-contained, no shared references.
+    resources:
+    - name: admin-createVol
+      path: /admin/createVol
+      operations:
+      - name: createvolume
+        method: GET
+        description: CubeFS Create a volume
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+          description: Unique name for the new volume.
+          required: true
+        - name: capacity
+          in: query
+          type: integer
+          description: Capacity of the volume in GB.
+          required: true
+        - name: owner
+          in: query
+          type: string
+          description: User ID that owns this volume. Creates the user if they do not exist.
+          required: true
+        - name: mpCount
+          in: query
+          type: integer
+          description: Initial number of metadata partitions. Defaults to 3.
+        - name: dpCount
+          in: query
+          type: integer
+          description: Initial number of data partitions. Defaults to 10.
+        - name: replicaNum
+          in: query
+          type: integer
+          description: Replication factor for data partitions. Defaults to 3.
+        - name: followerRead
+          in: query
+          type: string
+          description: Whether follower replicas can serve read requests.
+        - name: enablePosixAcl
+          in: query
+          type: string
+          description: Whether POSIX ACL is enabled for this volume.
+        - name: volType
+          in: query
+          type: integer
+          description: Volume type. 0 for replicated, 1 for erasure coded.
+        - name: qosEnable
+          in: query
+          type: string
+          description: Whether QoS (quality of service) throttling is enabled.
+    - name: admin-getVol
+      path: /admin/getVol
+      operations:
+      - name: getvolume
+        method: GET
+        description: CubeFS Get volume information
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+          description: Name of the volume to retrieve.
+          required: true
+        - name: authKey
+          in: query
+          type: string
+          description: MD5 of the owner's user ID for authentication.
+          required: true
+    - name: admin-listVols
+      path: /admin/listVols
+      operations:
+      - name: listvolumes
+        method: GET
+        description: CubeFS List volumes
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: keywords
+          in: query
+          type: string
+          description: Substring filter for volume names.
+    - name: vol-delete
+      path: /vol/delete
+      operations:
+      - name: deletevolume
+        method: GET
+        description: CubeFS Delete a volume
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+          description: Name of the volume to delete.
+          required: true
+        - name: authKey
+          in: query
+          type: string
+          description: MD5 of the owner's user ID for authentication.
+          required: true
+    - name: vol-expand
+      path: /vol/expand
+      operations:
+      - name: expandvolume
+        method: GET
+        description: CubeFS Expand volume capacity
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+          description: Name of the volume to expand.
+          required: true
+        - name: authKey
+          in: query
+          type: string
+          description: MD5 of the owner's user ID for authentication.
+          required: true
+        - name: capacity
+          in: query
+          type: integer
+          description: New capacity in GB. Must be greater than current capacity.
+          required: true
+    - name: vol-update
+      path: /vol/update
+      operations:
+      - name: updatevolume
+        method: GET
+        description: CubeFS Update volume configuration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: name
+          in: query
+          type: string
+          description: Name of the volume to update.
+          required: true
+        - name: authKey
+          in: query
+          type: string
+          description: MD5 of the owner's user ID for authentication.
+          required: true
+        - name: capacity
+          in: query
+          type: integer
+          description: New capacity in GB for the volume.
+        - name: followerRead
+          in: query
+          type: string
+          description: Enable or disable follower reads.
+        - name: replicaNum
+          in: query
+          type: integer
+          description: New replication factor for the volume.
+        - name: enablePosixAcl
+          in: query
+          type: string
+          description: Enable or disable POSIX ACL.
+  exposes:
+  - type: rest
+    namespace: master-volumes-rest
+    port: 8080
+    description: REST adapter for CubeFS Master API — Volumes. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/admin/createvol
+      name: admin-createvol
+      description: REST surface for admin-createVol.
+      operations:
+      - method: GET
+        name: createvolume
+        description: CubeFS Create a volume
+        call: master-volumes.createvolume
+        with:
+          name: rest.name
+          capacity: rest.capacity
+          owner: rest.owner
+          mpCount: rest.mpCount
+          dpCount: rest.dpCount
+          replicaNum: rest.replicaNum
+          followerRead: rest.followerRead
+          enablePosixAcl: rest.enablePosixAcl
+          volType: rest.volType
+          qosEnable: rest.qosEnable
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/admin/getvol
+      name: admin-getvol
+      description: REST surface for admin-getVol.
+      operations:
+      - method: GET
+        name: getvolume
+        description: CubeFS Get volume information
+        call: master-volumes.getvolume
+        with:
+          name: rest.name
+          authKey: rest.authKey
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/admin/listvols
+      name: admin-listvols
+      description: REST surface for admin-listVols.
+      operations:
+      - method: GET
+        name: listvolumes
+        description: CubeFS List volumes
+        call: master-volumes.listvolumes
+        with:
+          keywords: rest.keywords
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/vol/delete
+      name: vol-delete
+      description: REST surface for vol-delete.
+      operations:
+      - method: GET
+        name: deletevolume
+        description: CubeFS Delete a volume
+        call: master-volumes.deletevolume
+        with:
+          name: rest.name
+          authKey: rest.authKey
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/vol/expand
+      name: vol-expand
+      description: REST surface for vol-expand.
+      operations:
+      - method: GET
+        name: expandvolume
+        description: CubeFS Expand volume capacity
+        call: master-volumes.expandvolume
+        with:
+          name: rest.name
+          authKey: rest.authKey
+          capacity: rest.capacity
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/vol/update
+      name: vol-update
+      description: REST surface for vol-update.
+      operations:
+      - method: GET
+        name: updatevolume
+        description: CubeFS Update volume configuration
+        call: master-volumes.updatevolume
+        with:
+          name: rest.name
+          authKey: rest.authKey
+          capacity: rest.capacity
+          followerRead: rest.followerRead
+          replicaNum: rest.replicaNum
+          enablePosixAcl: rest.enablePosixAcl
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: master-volumes-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for CubeFS Master API — Volumes. One tool per consumed operation, routed inline through this
+      capability's consumes block.
+    tools:
+    - name: cubefs-create-volume
+      description: CubeFS Create a volume
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-volumes.createvolume
+      with:
+        name: tools.name
+        capacity: tools.capacity
+        owner: tools.owner
+        mpCount: tools.mpCount
+        dpCount: tools.dpCount
+        replicaNum: tools.replicaNum
+        followerRead: tools.followerRead
+        enablePosixAcl: tools.enablePosixAcl
+        volType: tools.volType
+        qosEnable: tools.qosEnable
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-get-volume-information
+      description: CubeFS Get volume information
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-volumes.getvolume
+      with:
+        name: tools.name
+        authKey: tools.authKey
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-list-volumes
+      description: CubeFS List volumes
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-volumes.listvolumes
+      with:
+        keywords: tools.keywords
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-delete-volume
+      description: CubeFS Delete a volume
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-volumes.deletevolume
+      with:
+        name: tools.name
+        authKey: tools.authKey
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-expand-volume-capacity
+      description: CubeFS Expand volume capacity
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-volumes.expandvolume
+      with:
+        name: tools.name
+        authKey: tools.authKey
+        capacity: tools.capacity
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-update-volume-configuration
+      description: CubeFS Update volume configuration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-volumes.updatevolume
+      with:
+        name: tools.name
+        authKey: tools.authKey
+        capacity: tools.capacity
+        followerRead: tools.followerRead
+        replicaNum: tools.replicaNum
+        enablePosixAcl: tools.enablePosixAcl
+      outputParameters:
+      - type: object
+        mapping: $.

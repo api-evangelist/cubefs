@@ -1,0 +1,113 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: CubeFS S3-Compatible API — ACLs
+  description: 'CubeFS S3-Compatible API — ACLs. 2 operations. Lead operation: CubeFS Get bucket ACL. Self-contained Naftiko
+    capability covering one Cubefs business surface.'
+  tags:
+  - Cubefs
+  - ACLs
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    CUBEFS_API_KEY: CUBEFS_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: s3-acls
+    baseUri: http://{objectNodeHost}:{objectNodePort}
+    description: CubeFS S3-Compatible API — ACLs business capability. Self-contained, no shared references.
+    resources:
+    - name: bucket}?acl
+      path: /{bucket}?acl
+      operations:
+      - name: getbucketacl
+        method: GET
+        description: CubeFS Get bucket ACL
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: putbucketacl
+        method: PUT
+        description: CubeFS Set bucket ACL
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: x-amz-acl
+          in: header
+          type: string
+          description: Canned ACL to apply. Mutually exclusive with request body ACL.
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: false
+    authentication:
+      type: apikey
+      key: Authorization
+      value: '{{env.CUBEFS_API_KEY}}'
+      placement: header
+  exposes:
+  - type: rest
+    namespace: s3-acls-rest
+    port: 8080
+    description: REST adapter for CubeFS S3-Compatible API — ACLs. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/bucket-acl
+      name: bucket-acl
+      description: REST surface for bucket}?acl.
+      operations:
+      - method: GET
+        name: getbucketacl
+        description: CubeFS Get bucket ACL
+        call: s3-acls.getbucketacl
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PUT
+        name: putbucketacl
+        description: CubeFS Set bucket ACL
+        call: s3-acls.putbucketacl
+        with:
+          x-amz-acl: rest.x-amz-acl
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: s3-acls-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for CubeFS S3-Compatible API — ACLs. One tool per consumed operation, routed inline through this
+      capability's consumes block.
+    tools:
+    - name: cubefs-get-bucket-acl
+      description: CubeFS Get bucket ACL
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: s3-acls.getbucketacl
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-set-bucket-acl
+      description: CubeFS Set bucket ACL
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: s3-acls.putbucketacl
+      with:
+        x-amz-acl: tools.x-amz-acl
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

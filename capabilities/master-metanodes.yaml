@@ -1,0 +1,161 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: CubeFS Master API — MetaNodes
+  description: 'CubeFS Master API — MetaNodes. 3 operations. Lead operation: CubeFS Add a metadata node. Self-contained Naftiko
+    capability covering one Cubefs business surface.'
+  tags:
+  - Cubefs
+  - MetaNodes
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    CUBEFS_API_KEY: CUBEFS_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: master-metanodes
+    baseUri: http://{masterHost}:{masterPort}
+    description: CubeFS Master API — MetaNodes business capability. Self-contained, no shared references.
+    resources:
+    - name: metaNode-add
+      path: /metaNode/add
+      operations:
+      - name: addmetanode
+        method: GET
+        description: CubeFS Add a metadata node
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: addr
+          in: query
+          type: string
+          description: Address of the metadata node in host:port format.
+          required: true
+    - name: metaNode-decommission
+      path: /metaNode/decommission
+      operations:
+      - name: decommissionmetanode
+        method: GET
+        description: CubeFS Decommission a metadata node
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: addr
+          in: query
+          type: string
+          description: Address of the metadata node to decommission in host:port format.
+          required: true
+    - name: metaNode-get
+      path: /metaNode/get
+      operations:
+      - name: getmetanode
+        method: GET
+        description: CubeFS Get metadata node information
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: addr
+          in: query
+          type: string
+          description: Address of the metadata node in host:port format.
+          required: true
+  exposes:
+  - type: rest
+    namespace: master-metanodes-rest
+    port: 8080
+    description: REST adapter for CubeFS Master API — MetaNodes. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/metanode/add
+      name: metanode-add
+      description: REST surface for metaNode-add.
+      operations:
+      - method: GET
+        name: addmetanode
+        description: CubeFS Add a metadata node
+        call: master-metanodes.addmetanode
+        with:
+          addr: rest.addr
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/metanode/decommission
+      name: metanode-decommission
+      description: REST surface for metaNode-decommission.
+      operations:
+      - method: GET
+        name: decommissionmetanode
+        description: CubeFS Decommission a metadata node
+        call: master-metanodes.decommissionmetanode
+        with:
+          addr: rest.addr
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/metanode/get
+      name: metanode-get
+      description: REST surface for metaNode-get.
+      operations:
+      - method: GET
+        name: getmetanode
+        description: CubeFS Get metadata node information
+        call: master-metanodes.getmetanode
+        with:
+          addr: rest.addr
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: master-metanodes-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for CubeFS Master API — MetaNodes. One tool per consumed operation, routed inline through this
+      capability's consumes block.
+    tools:
+    - name: cubefs-add-metadata-node
+      description: CubeFS Add a metadata node
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-metanodes.addmetanode
+      with:
+        addr: tools.addr
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-decommission-metadata-node
+      description: CubeFS Decommission a metadata node
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-metanodes.decommissionmetanode
+      with:
+        addr: tools.addr
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cubefs-get-metadata-node-information
+      description: CubeFS Get metadata node information
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: master-metanodes.getmetanode
+      with:
+        addr: tools.addr
+      outputParameters:
+      - type: object
+        mapping: $.
