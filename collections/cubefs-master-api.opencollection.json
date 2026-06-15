@@ -1,0 +1,624 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Cluster",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Get cluster information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/getCluster"
+          },
+          "docs": "Returns comprehensive information about the CubeFS cluster including the list of data nodes, metadata nodes, and volumes. Also returns cluster-wide space statistics including total, used, and available capacity across all nodes."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get cluster statistics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/cluster/stat"
+          },
+          "docs": "Returns space usage statistics for the CubeFS cluster broken down by region. Includes TotalGB, UsedGB, IncreaseGB, UsedRatio metrics for both data nodes and metadata nodes."
+        },
+        {
+          "info": {
+            "name": "CubeFS Freeze or unfreeze the cluster",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/cluster/freeze",
+            "params": [
+              {
+                "name": "enable",
+                "value": "",
+                "type": "query",
+                "description": "Set to true to freeze the cluster or false to unfreeze it."
+              }
+            ]
+          },
+          "docs": "Freezes or unfreezes the cluster. When frozen, volumes will no longer automatically create data or metadata partitions. This is used during maintenance operations to prevent new partition creation."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Volumes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a volume",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/createVol",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Unique name for the new volume."
+              },
+              {
+                "name": "capacity",
+                "value": "",
+                "type": "query",
+                "description": "Capacity of the volume in GB."
+              },
+              {
+                "name": "owner",
+                "value": "",
+                "type": "query",
+                "description": "User ID that owns this volume. Creates the user if they do not exist."
+              },
+              {
+                "name": "mpCount",
+                "value": "",
+                "type": "query",
+                "description": "Initial number of metadata partitions. Defaults to 3."
+              },
+              {
+                "name": "dpCount",
+                "value": "",
+                "type": "query",
+                "description": "Initial number of data partitions. Defaults to 10."
+              },
+              {
+                "name": "replicaNum",
+                "value": "",
+                "type": "query",
+                "description": "Replication factor for data partitions. Defaults to 3."
+              },
+              {
+                "name": "followerRead",
+                "value": "",
+                "type": "query",
+                "description": "Whether follower replicas can serve read requests."
+              },
+              {
+                "name": "enablePosixAcl",
+                "value": "",
+                "type": "query",
+                "description": "Whether POSIX ACL is enabled for this volume."
+              },
+              {
+                "name": "volType",
+                "value": "",
+                "type": "query",
+                "description": "Volume type. 0 for replicated, 1 for erasure coded."
+              },
+              {
+                "name": "qosEnable",
+                "value": "",
+                "type": "query",
+                "description": "Whether QoS (quality of service) throttling is enabled."
+              }
+            ]
+          },
+          "docs": "Creates a new CubeFS volume with the specified configuration. Volumes are the top-level namespace for storing data. When created, CubeFS allocates 10 data partitions and 3 metadata partitions by default. If no user matching the owner ID exists, a new user is automatically created with that ID. The volume can be configured for replication or erasure coding."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get volume information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/getVol",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to retrieve."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific volume including its name, owner, capacity, replication configuration, data partition list, metadata partition list, and current status."
+        },
+        {
+          "info": {
+            "name": "CubeFS List volumes",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/listVols",
+            "params": [
+              {
+                "name": "keywords",
+                "value": "",
+                "type": "query",
+                "description": "Substring filter for volume names."
+              }
+            ]
+          },
+          "docs": "Returns a list of all volumes in the cluster. The results can be filtered by keyword to match volume names containing the specified substring."
+        },
+        {
+          "info": {
+            "name": "CubeFS Update volume configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/vol/update",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to update."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              },
+              {
+                "name": "capacity",
+                "value": "",
+                "type": "query",
+                "description": "New capacity in GB for the volume."
+              },
+              {
+                "name": "followerRead",
+                "value": "",
+                "type": "query",
+                "description": "Enable or disable follower reads."
+              },
+              {
+                "name": "replicaNum",
+                "value": "",
+                "type": "query",
+                "description": "New replication factor for the volume."
+              },
+              {
+                "name": "enablePosixAcl",
+                "value": "",
+                "type": "query",
+                "description": "Enable or disable POSIX ACL."
+              }
+            ]
+          },
+          "docs": "Updates configuration parameters for an existing volume including capacity, replication settings, QoS parameters, follower read policy, and access control settings."
+        },
+        {
+          "info": {
+            "name": "CubeFS Delete a volume",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/vol/delete",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to delete."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              }
+            ]
+          },
+          "docs": "Marks a volume for deletion. The volume is first logically deleted by setting its status to deleted, then all data and metadata partitions are asynchronously removed via periodic tasks. Erasure-coded volumes can only be deleted when their used size is 0."
+        },
+        {
+          "info": {
+            "name": "CubeFS Expand volume capacity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/vol/expand",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to expand."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              },
+              {
+                "name": "capacity",
+                "value": "",
+                "type": "query",
+                "description": "New capacity in GB. Must be greater than current capacity."
+              }
+            ]
+          },
+          "docs": "Expands the storage capacity of a volume to the specified size in GB. The new capacity must be larger than the current capacity. CubeFS will automatically allocate additional data partitions as needed."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "DataNodes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Add a data node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataNode/add",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node in host:port format."
+              }
+            ]
+          },
+          "docs": "Registers a new data node with the cluster at the specified address. The data node must already be running and accessible at the given address before it can be added to the cluster."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get data node information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataNode/get",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node in host:port format."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific data node including its address, status, available capacity, used capacity, data partition list, and disk information."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a data node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataNode/decommission",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node to decommission in host:port format."
+              }
+            ]
+          },
+          "docs": "Removes a data node from the cluster. All data partitions on the node are asynchronously migrated to other available data nodes before the node is fully removed. This is a safe operation for draining a node during maintenance or replacement."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "MetaNodes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Add a metadata node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaNode/add",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node in host:port format."
+              }
+            ]
+          },
+          "docs": "Registers a new metadata node with the cluster at the specified address. The metadata node must already be running and accessible before it can join the cluster."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get metadata node information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaNode/get",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node in host:port format."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific metadata node including its address, status, memory usage, metadata partition list, and available capacity."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a metadata node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaNode/decommission",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node to decommission in host:port format."
+              }
+            ]
+          },
+          "docs": "Removes a metadata node from the cluster. All metadata partitions on the node are asynchronously migrated to other available metadata nodes before the node is fully removed."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "http://{masterHost}:{masterPort}/user/create",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new CubeFS user for multi-tenancy and object storage access. Users can be assigned an access key and secret key for S3-compatible API operations. User types include normal (0) and admin (1)."
+        },
+        {
+          "info": {
+            "name": "CubeFS Delete a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/user/delete",
+            "params": [
+              {
+                "name": "user",
+                "value": "",
+                "type": "query",
+                "description": "User ID to delete."
+              }
+            ]
+          },
+          "docs": "Removes a user from the CubeFS cluster. The user must not own any volumes before deletion. All access permissions associated with the user are also removed."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get user information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/user/info",
+            "params": [
+              {
+                "name": "user",
+                "value": "",
+                "type": "query",
+                "description": "User ID to retrieve."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific user including their access key, secret key, list of owned volumes, and volume permissions."
+        },
+        {
+          "info": {
+            "name": "CubeFS List users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/user/list",
+            "params": [
+              {
+                "name": "keywords",
+                "value": "",
+                "type": "query",
+                "description": "Substring filter for user IDs."
+              }
+            ]
+          },
+          "docs": "Returns a list of all users in the CubeFS cluster. Results can be filtered by keyword to match user IDs containing the specified substring."
+        },
+        {
+          "info": {
+            "name": "CubeFS Update user volume permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "http://{masterHost}:{masterPort}/user/updatePolicy",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Grants or revokes a user's access permissions on a specific volume. Permission values are READONLY (read-only access), READWRITE (full read/write access), or NONE (removes all permissions)."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "DataPartitions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a data partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataPartition/create",
+            "params": [
+              {
+                "name": "count",
+                "value": "",
+                "type": "query",
+                "description": "Number of data partitions to create."
+              },
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to create data partitions for."
+              }
+            ]
+          },
+          "docs": "Manually creates a data partition for a specific volume. This is typically done automatically by the Master when volume usage exceeds thresholds, but can be triggered manually when the cluster is frozen or for operational purposes."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a data partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataPartition/decommission",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "query",
+                "description": "ID of the data partition to decommission."
+              },
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node hosting the partition to migrate away from."
+              }
+            ]
+          },
+          "docs": "Migrates a specific data partition from a given data node to another available data node. Used to drain a node before decommissioning or to rebalance data distribution."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "MetaPartitions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a metadata partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaPartition/create",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to create metadata partitions for."
+              }
+            ]
+          },
+          "docs": "Manually creates a metadata partition for a specific volume. This is typically triggered when existing metadata partitions approach their inode count limits, but can also be done manually."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a metadata partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaPartition/decommission",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "query",
+                "description": "ID of the metadata partition to decommission."
+              },
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node hosting the partition."
+              }
+            ]
+          },
+          "docs": "Migrates a metadata partition from a given metadata node to another available node. Used to drain a metadata node before decommissioning or to rebalance metadata distribution."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
