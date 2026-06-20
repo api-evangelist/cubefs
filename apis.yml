@@ -7,7 +7,7 @@ description: >-
   storage protocols. It provides multi-tenancy, multi-AZ deployment, cross-region replication, and erasure coding for
   both hot and cold data tiers, and is widely used to back cloud-native AI training, big-data analytics, and container
   storage workloads.
-image: https://kinlane-productions2.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
 tags:
   - Cloud Native
   - CNCF Graduated
