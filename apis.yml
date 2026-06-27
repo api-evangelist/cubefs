@@ -135,7 +135,7 @@ common:
     name: CubeFS GitHub Repository
     description: Main CubeFS source code repository.
     url: https://github.com/cubefs/cubefs
-  - type: LLMsTxt
+  - type: LlmsText
     url: https://cubefs.io/llms.txt
 maintainers:
   - FN: Kin Lane
