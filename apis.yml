@@ -94,6 +94,10 @@ useCases:
   - name: Hot/Cold Tiering
     description: Replicated tier for hot data and erasure-coded tier for cold data.
 common:
+  - type: DomainSecurity
+    url: security/cubefs-domain-security.yml
+  - type: Authentication
+    url: authentication/cubefs-authentication.yml
   - type: JSONLD
     url: json-ld/cubefs-context.jsonld
     name: CubeFS JSON-LD Context

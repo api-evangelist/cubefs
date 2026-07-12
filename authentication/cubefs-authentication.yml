@@ -1,0 +1,18 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/cubefs-s3-api-openapi.yml
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: awsAuth
+  type: apiKey
+  in: header
+  parameter: Authorization
+  description: 'AWS Signature Version 4 authorization. Format: AWS4-HMAC-SHA256 Credential={accessKey}/{date}/{region}/s3/aws4_request,
+    SignedHeaders={headers}, Signature={signature}. Access keys are managed via the CubeFS Master
+    API user management endpoints.'
+  sources:
+  - openapi/cubefs-s3-api-openapi.yml
