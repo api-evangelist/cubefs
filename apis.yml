@@ -94,6 +94,8 @@ useCases:
   - name: Hot/Cold Tiering
     description: Replicated tier for hot data and erasure-coded tier for cold data.
 common:
+  - type: AgenticAccess
+    url: agentic-access/cubefs-agentic-access.yml
   - type: DomainSecurity
     url: security/cubefs-domain-security.yml
   - type: Authentication
