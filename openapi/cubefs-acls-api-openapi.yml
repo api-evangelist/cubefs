@@ -1,0 +1,179 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: ACLs
+  description: Access control list operations for buckets and objects. Supports getting and setting ACLs to control access at the bucket and object level.
+paths:
+  /{bucket}?acl:
+    get:
+      operationId: getBucketAcl
+      summary: CubeFS Get bucket ACL
+      description: Returns the access control list for the specified bucket. The ACL defines which accounts or groups have read and write access to the bucket.
+      tags:
+      - ACLs
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      responses:
+        '200':
+          description: Bucket ACL retrieved successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/AccessControlPolicy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      operationId: putBucketAcl
+      summary: CubeFS Set bucket ACL
+      description: Sets the access control list for the specified bucket. Supports canned ACLs (private, public-read) or a custom ACL with explicit grants.
+      tags:
+      - ACLs
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - name: x-amz-acl
+        in: header
+        required: false
+        description: Canned ACL to apply. Mutually exclusive with request body ACL.
+        schema:
+          type: string
+          enum:
+          - private
+          - public-read
+          - public-read-write
+      requestBody:
+        required: false
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/AccessControlPolicy'
+      responses:
+        '200':
+          description: Bucket ACL set successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  responses:
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+  schemas:
+    Grant:
+      type: object
+      description: A permission grant in an ACL.
+      properties:
+        Grantee:
+          $ref: '#/components/schemas/Grantee'
+        Permission:
+          type: string
+          enum:
+          - FULL_CONTROL
+          - READ
+          - WRITE
+          - READ_ACP
+          - WRITE_ACP
+          description: Permission level granted.
+    AccessControlPolicy:
+      type: object
+      description: Access control policy for a bucket or object.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        AccessControlList:
+          type: object
+          description: Container for grant entries.
+          properties:
+            Grant:
+              type: array
+              description: List of access control grants.
+              items:
+                $ref: '#/components/schemas/Grant'
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+    Owner:
+      type: object
+      description: Owner of a bucket or object.
+      properties:
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
+    Grantee:
+      type: object
+      description: An entity to whom access is being granted.
+      properties:
+        ID:
+          type: string
+          description: User ID or group identifier.
+        DisplayName:
+          type: string
+          description: Display name of the grantee.
+        Type:
+          type: string
+          description: Type of grantee, typically CanonicalUser or Group.
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

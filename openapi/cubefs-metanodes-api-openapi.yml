@@ -1,0 +1,178 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs MetaNodes API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: MetaNodes
+  description: Metadata node management operations including listing nodes, querying node status, decommissioning nodes, and managing metadata partitions.
+paths:
+  /metaNode/add:
+    get:
+      operationId: addMetaNode
+      summary: CubeFS Add a metadata node
+      description: Registers a new metadata node with the cluster at the specified address. The metadata node must already be running and accessible before it can join the cluster.
+      tags:
+      - MetaNodes
+      parameters:
+      - name: addr
+        in: query
+        required: true
+        description: Address of the metadata node in host:port format.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Metadata node added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /metaNode/get:
+    get:
+      operationId: getMetaNode
+      summary: CubeFS Get metadata node information
+      description: Returns detailed information about a specific metadata node including its address, status, memory usage, metadata partition list, and available capacity.
+      tags:
+      - MetaNodes
+      parameters:
+      - name: addr
+        in: query
+        required: true
+        description: Address of the metadata node in host:port format.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Metadata node information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaNodeInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /metaNode/decommission:
+    get:
+      operationId: decommissionMetaNode
+      summary: CubeFS Decommission a metadata node
+      description: Removes a metadata node from the cluster. All metadata partitions on the node are asynchronously migrated to other available metadata nodes before the node is fully removed.
+      tags:
+      - MetaNodes
+      parameters:
+      - name: addr
+        in: query
+        required: true
+        description: Address of the metadata node to decommission in host:port format.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Metadata node decommission initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    MetaNodeInfoResponse:
+      type: object
+      description: Detailed metadata node information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: object
+          description: Metadata node details.
+          properties:
+            Addr:
+              type: string
+              description: Address of the metadata node.
+            Status:
+              type: boolean
+              description: Whether the node is active.
+            TotalWeight:
+              type: integer
+              description: Total memory/storage capacity.
+            UsedWeight:
+              type: integer
+              description: Used memory/storage.
+            MetaPartitionCount:
+              type: integer
+              description: Number of metadata partitions on this node.
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

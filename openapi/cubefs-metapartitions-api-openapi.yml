@@ -1,0 +1,120 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs MetaPartitions API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: MetaPartitions
+  description: Metadata partition management including creating, loading, and decommissioning metadata partitions within volumes.
+paths:
+  /metaPartition/create:
+    get:
+      operationId: createMetaPartition
+      summary: CubeFS Create a metadata partition
+      description: Manually creates a metadata partition for a specific volume. This is typically triggered when existing metadata partitions approach their inode count limits, but can also be done manually.
+      tags:
+      - MetaPartitions
+      parameters:
+      - name: name
+        in: query
+        required: true
+        description: Name of the volume to create metadata partitions for.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Metadata partition created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /metaPartition/decommission:
+    get:
+      operationId: decommissionMetaPartition
+      summary: CubeFS Decommission a metadata partition
+      description: Migrates a metadata partition from a given metadata node to another available node. Used to drain a metadata node before decommissioning or to rebalance metadata distribution.
+      tags:
+      - MetaPartitions
+      parameters:
+      - name: id
+        in: query
+        required: true
+        description: ID of the metadata partition to decommission.
+        schema:
+          type: integer
+      - name: addr
+        in: query
+        required: true
+        description: Address of the metadata node hosting the partition.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Metadata partition decommission initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
+  responses:
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

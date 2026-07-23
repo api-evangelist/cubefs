@@ -1,0 +1,363 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs Objects API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: Objects
+  description: Object CRUD operations including uploading, downloading, copying, listing, and deleting objects. Supports both standard single-part uploads and multipart uploads for large objects.
+paths:
+  /{bucket}:
+    get:
+      operationId: listObjects
+      summary: CubeFS List objects in a bucket
+      description: Returns a list of objects in a bucket. Supports prefix filtering, delimiter-based grouping for simulating directory hierarchies, and pagination via continuation tokens. Returns up to 1000 objects per request by default.
+      tags:
+      - Objects
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - name: prefix
+        in: query
+        required: false
+        description: Only return objects whose keys begin with this prefix.
+        schema:
+          type: string
+      - name: delimiter
+        in: query
+        required: false
+        description: Character used to group keys. Keys with the same string between the prefix and the first occurrence of the delimiter are grouped under a common prefix.
+        schema:
+          type: string
+      - name: max-keys
+        in: query
+        required: false
+        description: Maximum number of objects to return. Defaults to 1000.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+      - name: continuation-token
+        in: query
+        required: false
+        description: Continuation token for paginating through large result sets.
+        schema:
+          type: string
+      - name: list-type
+        in: query
+        required: false
+        description: Set to 2 to use the List Objects V2 format with continuation tokens.
+        schema:
+          type: integer
+          enum:
+          - 2
+      responses:
+        '200':
+          description: Object list retrieved successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListBucketResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /{bucket}/{key}:
+    put:
+      operationId: putObject
+      summary: CubeFS Upload an object
+      description: Uploads an object to the specified bucket at the given key path. The object data is provided in the request body. The Content-Type and Content-Length headers should be set appropriately. Server-side encryption, metadata, and ACL settings can be specified via headers.
+      tags:
+      - Objects
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      - name: Content-Type
+        in: header
+        required: false
+        description: MIME type of the object being uploaded.
+        schema:
+          type: string
+      - name: Content-MD5
+        in: header
+        required: false
+        description: Base64-encoded MD5 digest of the request body for integrity verification.
+        schema:
+          type: string
+      - name: x-amz-acl
+        in: header
+        required: false
+        description: Canned ACL to apply to the object.
+        schema:
+          type: string
+          enum:
+          - private
+          - public-read
+          - public-read-write
+          - authenticated-read
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              description: Binary content of the object to upload.
+      responses:
+        '200':
+          description: Object uploaded successfully.
+          headers:
+            ETag:
+              description: Entity tag (MD5 hash) of the uploaded object.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    get:
+      operationId: getObject
+      summary: CubeFS Download an object
+      description: Downloads the content of an object from the specified bucket at the given key. Supports range requests for partial content downloads and conditional requests based on ETag or modification time.
+      tags:
+      - Objects
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      - name: Range
+        in: header
+        required: false
+        description: Byte range for partial content download, e.g. bytes=0-1023.
+        schema:
+          type: string
+      - name: If-Match
+        in: header
+        required: false
+        description: Only return the object if its ETag matches.
+        schema:
+          type: string
+      - name: If-Modified-Since
+        in: header
+        required: false
+        description: Only return the object if it was modified after this date.
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Object downloaded successfully.
+          headers:
+            Content-Type:
+              description: MIME type of the object.
+              schema:
+                type: string
+            ETag:
+              description: Entity tag of the object.
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp when the object was last modified.
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                description: Object content.
+        '304':
+          description: Object not modified (conditional request).
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    head:
+      operationId: headObject
+      summary: CubeFS Get object metadata
+      description: Returns metadata for the specified object without downloading its content. Returns the same headers as GetObject but with an empty body. Useful for checking existence, size, and ETag before downloading.
+      tags:
+      - Objects
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      responses:
+        '200':
+          description: Object metadata retrieved successfully.
+          headers:
+            Content-Type:
+              description: MIME type of the object.
+              schema:
+                type: string
+            Content-Length:
+              description: Size of the object in bytes.
+              schema:
+                type: integer
+            ETag:
+              description: Entity tag of the object.
+              schema:
+                type: string
+            Last-Modified:
+              description: Timestamp when the object was last modified.
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteObject
+      summary: CubeFS Delete an object
+      description: Deletes a single object from a bucket. The operation is idempotent — deleting a non-existent object returns a 204 with no error.
+      tags:
+      - Objects
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      responses:
+        '204':
+          description: Object deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  responses:
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+  schemas:
+    ObjectInfo:
+      type: object
+      description: Metadata about an object in a bucket.
+      properties:
+        Key:
+          type: string
+          description: Object key.
+        LastModified:
+          type: string
+          format: date-time
+          description: Timestamp when the object was last modified.
+        ETag:
+          type: string
+          description: MD5 hash of the object content.
+        Size:
+          type: integer
+          description: Size of the object in bytes.
+        StorageClass:
+          type: string
+          description: Storage class of the object.
+        Owner:
+          $ref: '#/components/schemas/Owner'
+    CommonPrefix:
+      type: object
+      description: Common prefix resulting from delimiter-based grouping.
+      properties:
+        Prefix:
+          type: string
+          description: The common prefix string.
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+    Owner:
+      type: object
+      description: Owner of a bucket or object.
+      properties:
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
+    ListBucketResult:
+      type: object
+      description: Result of listing objects in a bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        Prefix:
+          type: string
+          description: Filter prefix used in the request.
+        Delimiter:
+          type: string
+          description: Delimiter used for grouping.
+        MaxKeys:
+          type: integer
+          description: Maximum number of keys returned.
+        IsTruncated:
+          type: boolean
+          description: Whether the results were truncated due to MaxKeys.
+        NextContinuationToken:
+          type: string
+          description: Token to use for the next page of results when IsTruncated is true.
+        Contents:
+          type: array
+          description: List of objects matching the request.
+          items:
+            $ref: '#/components/schemas/ObjectInfo'
+        CommonPrefixes:
+          type: array
+          description: List of common prefixes from delimiter grouping.
+          items:
+            $ref: '#/components/schemas/CommonPrefix'
+  parameters:
+    key:
+      name: key
+      in: path
+      required: true
+      description: Object key (path within the bucket). Use forward slashes to simulate directory hierarchies.
+      schema:
+        type: string
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

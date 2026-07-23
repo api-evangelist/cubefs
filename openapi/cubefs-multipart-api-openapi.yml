@@ -1,0 +1,252 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs Multipart API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: Multipart
+  description: Multipart upload operations for uploading large objects in parts. Supports initiating, uploading parts, listing parts, completing, and aborting multipart uploads.
+paths:
+  /{bucket}/{key}?uploads:
+    post:
+      operationId: createMultipartUpload
+      summary: CubeFS Initiate a multipart upload
+      description: Initiates a multipart upload session for a large object. Returns an UploadId that must be included in all subsequent part upload, list, complete, and abort requests for this multipart upload.
+      tags:
+      - Multipart
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      responses:
+        '200':
+          description: Multipart upload initiated.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/InitiateMultipartUploadResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /{bucket}/{key}?uploadId={uploadId}:
+    put:
+      operationId: uploadPart
+      summary: CubeFS Upload a part
+      description: Uploads a single part in a multipart upload. Parts must be between 5 MB and 5 GB. The part number must be between 1 and 10,000. Returns an ETag for the part that must be included when completing the upload.
+      tags:
+      - Multipart
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      - name: uploadId
+        in: query
+        required: true
+        description: Upload ID from the CreateMultipartUpload response.
+        schema:
+          type: string
+      - name: partNumber
+        in: query
+        required: true
+        description: Part number between 1 and 10,000.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 10000
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+              description: Binary content of this part.
+      responses:
+        '200':
+          description: Part uploaded successfully.
+          headers:
+            ETag:
+              description: ETag of the uploaded part, required for completing the multipart upload.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: completeMultipartUpload
+      summary: CubeFS Complete a multipart upload
+      description: Assembles the previously uploaded parts and completes the multipart upload. The request body must list all parts in order with their part numbers and ETags. The assembled object becomes available for download once this request succeeds.
+      tags:
+      - Multipart
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      - name: uploadId
+        in: query
+        required: true
+        description: Upload ID from the CreateMultipartUpload response.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CompleteMultipartUpload'
+      responses:
+        '200':
+          description: Multipart upload completed successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/CompleteMultipartUploadResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      operationId: abortMultipartUpload
+      summary: CubeFS Abort a multipart upload
+      description: Aborts an in-progress multipart upload and frees all storage consumed by previously uploaded parts. After aborting, no additional parts can be uploaded for this UploadId.
+      tags:
+      - Multipart
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      - $ref: '#/components/parameters/key'
+      - name: uploadId
+        in: query
+        required: true
+        description: Upload ID from the CreateMultipartUpload response.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Multipart upload aborted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    CompletedPart:
+      type: object
+      description: A part to include when completing a multipart upload.
+      required:
+      - PartNumber
+      - ETag
+      properties:
+        PartNumber:
+          type: integer
+          minimum: 1
+          maximum: 10000
+          description: Part number identifying this part.
+        ETag:
+          type: string
+          description: ETag returned when the part was uploaded.
+    CompleteMultipartUploadResult:
+      type: object
+      description: Result of completing a multipart upload.
+      properties:
+        Location:
+          type: string
+          description: URL of the newly created object.
+        Bucket:
+          type: string
+          description: Name of the bucket.
+        Key:
+          type: string
+          description: Key of the assembled object.
+        ETag:
+          type: string
+          description: ETag of the completed object.
+    CompleteMultipartUpload:
+      type: object
+      description: Request body for completing a multipart upload.
+      properties:
+        Part:
+          type: array
+          description: Ordered list of parts to assemble into the final object.
+          items:
+            $ref: '#/components/schemas/CompletedPart'
+    InitiateMultipartUploadResult:
+      type: object
+      description: Result of initiating a multipart upload.
+      properties:
+        Bucket:
+          type: string
+          description: Name of the bucket.
+        Key:
+          type: string
+          description: Object key for the multipart upload.
+        UploadId:
+          type: string
+          description: Unique identifier for this multipart upload session.
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+  parameters:
+    key:
+      name: key
+      in: path
+      required: true
+      description: Object key (path within the bucket). Use forward slashes to simulate directory hierarchies.
+      schema:
+        type: string
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

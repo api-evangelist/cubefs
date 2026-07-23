@@ -1,0 +1,194 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs Buckets API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: Buckets
+  description: Bucket-level operations including creating, listing, and deleting buckets. In CubeFS, each S3 bucket corresponds to a CubeFS volume. Bucket names must be unique within the cluster.
+paths:
+  /:
+    get:
+      operationId: listBuckets
+      summary: CubeFS List buckets
+      description: Returns a list of all buckets owned by the authenticated user. Each bucket corresponds to a CubeFS volume. The response includes the bucket name and creation date.
+      tags:
+      - Buckets
+      responses:
+        '200':
+          description: Bucket list retrieved successfully.
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ListAllMyBucketsResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /{bucket}:
+    put:
+      operationId: createBucket
+      summary: CubeFS Create a bucket
+      description: Creates a new S3 bucket, which corresponds to creating a new CubeFS volume. The bucket name becomes the volume name. The request may include a LocationConstraint to specify the storage region.
+      tags:
+      - Buckets
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      requestBody:
+        required: false
+        content:
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/CreateBucketConfiguration'
+      responses:
+        '200':
+          description: Bucket created successfully.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+    head:
+      operationId: headBucket
+      summary: CubeFS Check if a bucket exists
+      description: Checks whether a bucket exists and the caller has permission to access it. Returns 200 if the bucket exists and is accessible, 404 if it does not exist, or 403 if access is denied.
+      tags:
+      - Buckets
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      responses:
+        '200':
+          description: Bucket exists and is accessible.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteBucket
+      summary: CubeFS Delete a bucket
+      description: Deletes an empty S3 bucket. The bucket must be empty before deletion. Attempting to delete a non-empty bucket returns a 409 BucketNotEmpty error.
+      tags:
+      - Buckets
+      parameters:
+      - $ref: '#/components/parameters/bucket'
+      responses:
+        '204':
+          description: Bucket deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  schemas:
+    ListAllMyBucketsResult:
+      type: object
+      description: Result of the list buckets operation.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        Buckets:
+          type: object
+          description: Container for the bucket list.
+          properties:
+            Bucket:
+              type: array
+              description: List of bucket objects.
+              items:
+                $ref: '#/components/schemas/BucketInfo'
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+    BucketInfo:
+      type: object
+      description: Information about an S3 bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        CreationDate:
+          type: string
+          format: date-time
+          description: Timestamp when the bucket was created.
+    Owner:
+      type: object
+      description: Owner of a bucket or object.
+      properties:
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
+    CreateBucketConfiguration:
+      type: object
+      description: Optional configuration for bucket creation.
+      properties:
+        LocationConstraint:
+          type: string
+          description: Region or zone where the bucket should be created.
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Conflict:
+      description: A conflict occurred, such as a bucket already existing or not being empty.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

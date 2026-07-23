@@ -1,0 +1,310 @@
+openapi: 3.1.0
+info:
+  title: CubeFS Master ACLs Users API
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  version: '3.3'
+  contact:
+    name: CubeFS Community
+    url: https://cubefs.io/community/overview.html
+servers:
+- url: http://{masterHost}:{masterPort}
+  description: CubeFS Master node HTTP API server
+  variables:
+    masterHost:
+      default: 127.0.0.1
+      description: IP address or hostname of the CubeFS Master node.
+    masterPort:
+      default: '17010'
+      description: Listening port of the CubeFS Master node.
+tags:
+- name: Users
+  description: User and access control management for CubeFS multi-tenancy. Users own volumes and are assigned access keys and secret keys for S3-compatible object storage operations.
+paths:
+  /user/create:
+    post:
+      operationId: createUser
+      summary: CubeFS Create a user
+      description: Creates a new CubeFS user for multi-tenancy and object storage access. Users can be assigned an access key and secret key for S3-compatible API operations. User types include normal (0) and admin (1).
+      tags:
+      - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '200':
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /user/delete:
+    get:
+      operationId: deleteUser
+      summary: CubeFS Delete a user
+      description: Removes a user from the CubeFS cluster. The user must not own any volumes before deletion. All access permissions associated with the user are also removed.
+      tags:
+      - Users
+      parameters:
+      - name: user
+        in: query
+        required: true
+        description: User ID to delete.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: User deleted successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneralResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/info:
+    get:
+      operationId: getUserInfo
+      summary: CubeFS Get user information
+      description: Returns detailed information about a specific user including their access key, secret key, list of owned volumes, and volume permissions.
+      tags:
+      - Users
+      parameters:
+      - name: user
+        in: query
+        required: true
+        description: User ID to retrieve.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: User information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /user/list:
+    get:
+      operationId: listUsers
+      summary: CubeFS List users
+      description: Returns a list of all users in the CubeFS cluster. Results can be filtered by keyword to match user IDs containing the specified substring.
+      tags:
+      - Users
+      parameters:
+      - name: keywords
+        in: query
+        required: false
+        description: Substring filter for user IDs.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: User list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /user/updatePolicy:
+    post:
+      operationId: updateUserPolicy
+      summary: CubeFS Update user volume permissions
+      description: Grants or revokes a user's access permissions on a specific volume. Permission values are READONLY (read-only access), READWRITE (full read/write access), or NONE (removes all permissions).
+      tags:
+      - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserPolicyRequest'
+      responses:
+        '200':
+          description: User policy updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  schemas:
+    UserInfoResponse:
+      type: object
+      description: User information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          $ref: '#/components/schemas/UserInfo'
+    UserInfo:
+      type: object
+      description: CubeFS user account information.
+      properties:
+        user_id:
+          type: string
+          description: Unique user identifier.
+        access_key:
+          type: string
+          description: S3-compatible access key for object storage authentication.
+        secret_key:
+          type: string
+          description: S3-compatible secret key for object storage authentication.
+        own_vols:
+          type: array
+          description: List of volume names owned by this user.
+          items:
+            type: string
+            description: Volume name.
+        authorized_vols:
+          type: object
+          description: Map of volume names to permission levels for volumes the user has access to.
+          additionalProperties:
+            type: string
+            description: Permission level such as READONLY or READWRITE.
+        user_type:
+          type: integer
+          description: User type. 0 for normal, 1 for admin.
+        create_time:
+          type: string
+          description: User creation timestamp.
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
+    UserListResponse:
+      type: object
+      description: List of users response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: array
+          description: List of user objects.
+          items:
+            $ref: '#/components/schemas/UserInfo'
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
+    CreateUserRequest:
+      type: object
+      description: Request body for creating a CubeFS user.
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          description: Unique user identifier.
+        password:
+          type: string
+          description: Optional password for the user.
+        accessKey:
+          type: string
+          description: Optional S3 access key for object storage. Generated automatically if omitted.
+        secretKey:
+          type: string
+          description: Optional S3 secret key. Generated automatically if omitted.
+        userType:
+          type: integer
+          enum:
+          - 0
+          - 1
+          description: User type. 0 for normal user, 1 for admin user.
+    UpdateUserPolicyRequest:
+      type: object
+      description: Request body for updating user volume permissions.
+      required:
+      - user_id
+      - volume
+      - policy
+      properties:
+        user_id:
+          type: string
+          description: User ID to update permissions for.
+        volume:
+          type: string
+          description: Name of the volume to update permissions on.
+        policy:
+          type: string
+          enum:
+          - READONLY
+          - RO
+          - READWRITE
+          - RW
+          - NONE
+          description: Permission level to grant. READONLY/RO grants read-only access; READWRITE/RW grants full read/write access; NONE removes all access.
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: A resource with this name or ID already exists.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+externalDocs:
+  description: CubeFS Master Admin API Reference
+  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/
