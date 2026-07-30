@@ -7,7 +7,20 @@ description: >-
   storage protocols. It provides multi-tenancy, multi-AZ deployment, cross-region replication, and erasure coding for
   both hot and cold data tiers, and is widely used to back cloud-native AI training, big-data analytics, and container
   storage workloads.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
+accessModel:
+  pricing: freemium
+  onboarding: self-serve
+  trial: false
+  try_now: true
+  public: false
+  label: Freemium · Self-serve signup
+  confidence: high
+  source:
+  - plans
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/cubefs.png
 tags:
   - Cloud Native
   - CNCF Graduated
@@ -22,47 +35,259 @@ specificationVersion: '0.19'
 created: '2026-03-16'
 modified: '2026-05-19'
 apis:
-  - aid: cubefs:cubefs-s3-api
-    name: CubeFS S3-Compatible API
-    description: >-
-      CubeFS exposes an S3-compatible object storage interface through its ObjectNode component. AWS S3 SDKs work
-      without modification for bucket management, object CRUD, multipart uploads, and access control.
-    humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
-    tags:
-      - Compatible API
-      - Object Storage
-      - S3
-    properties:
-      - type: Documentation
-        url: https://cubefs.io/docs/master/user-guide/objectnode.html
-      - type: GitHubRepository
-        url: https://github.com/cubefs/cubefs
-      - type: OpenAPI
-        url: openapi/cubefs-s3-api-openapi.yml
-      - type: SpectralRules
-        url: rules/cubefs-s3-rules.yml
-  - aid: cubefs:cubefs-master-api
-    name: CubeFS Master API
-    description: >-
-      The CubeFS Master API provides HTTP endpoints for cluster management including volume creation/deletion, data and
-      meta partition management, data and meta node management, user/policy management, and cluster status monitoring.
-      It is the control plane interface for administering CubeFS clusters.
-    humanURL: https://cubefs.io/docs/master/dev-guide/master-api.html
-    tags:
-      - Admin API
-      - Cluster Management
-      - Control Plane
-    properties:
-      - type: Documentation
-        url: https://cubefs.io/docs/master/dev-guide/master-api.html
-      - type: GitHubRepository
-        url: https://github.com/cubefs/cubefs
-      - type: OpenAPI
-        url: openapi/cubefs-master-api-openapi.yml
-      - type: JSONSchema
-        url: json-schema/cubefs-volume-schema.json
-      - type: SpectralRules
-        url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-acls-api
+  name: CubeFS ACLs API
+  description: >-
+    Access control list operations for buckets and objects. Supports getting and setting ACLs to control
+    access at the bucket and object level.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - ACLs
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-acls-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-buckets-api
+  name: CubeFS Buckets API
+  description: >-
+    Bucket-level operations including creating, listing, and deleting buckets. In CubeFS, each S3 bucket
+    corresponds to a CubeFS volume. Bucket names must be unique within the cluster.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Buckets
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-buckets-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-cluster-api
+  name: CubeFS Cluster API
+  description: >-
+    Cluster-level operations including retrieving cluster status, topology, and freezing/unfreezing the
+    cluster to control automatic partition creation.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Cluster
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-cluster-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-datanodes-api
+  name: CubeFS DataNodes API
+  description: >-
+    Data node management operations including listing nodes, querying node status, decommissioning nodes,
+    and managing data partitions on nodes.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - DataNodes
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-datanodes-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-datapartitions-api
+  name: CubeFS DataPartitions API
+  description: >-
+    Data partition management including creating, loading, decommissioning, and diagnosing data partitions
+    within volumes.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - DataPartitions
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-datapartitions-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-metanodes-api
+  name: CubeFS MetaNodes API
+  description: >-
+    Metadata node management operations including listing nodes, querying node status, decommissioning
+    nodes, and managing metadata partitions.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - MetaNodes
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-metanodes-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-metapartitions-api
+  name: CubeFS MetaPartitions API
+  description: >-
+    Metadata partition management including creating, loading, and decommissioning metadata partitions
+    within volumes.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - MetaPartitions
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-metapartitions-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-multipart-api
+  name: CubeFS Multipart API
+  description: >-
+    Multipart upload operations for uploading large objects in parts. Supports initiating, uploading parts,
+    listing parts, completing, and aborting multipart uploads.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Multipart
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-multipart-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-objects-api
+  name: CubeFS Objects API
+  description: >-
+    Object CRUD operations including uploading, downloading, copying, listing, and deleting objects. Supports
+    both standard single-part uploads and multipart uploads for large objects.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Objects
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-objects-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-users-api
+  name: CubeFS Users API
+  description: >-
+    User and access control management for CubeFS multi-tenancy. Users own volumes and are assigned access
+    keys and secret keys for S3-compatible object storage operations.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-users-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-volumes-api
+  name: CubeFS Volumes API
+  description: >-
+    Volume lifecycle management operations including creating, updating, expanding, shrinking, and deleting
+    volumes. Volumes are the top-level storage namespaces in CubeFS.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Volumes
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-volumes-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
 features:
   - name: Multi-Protocol Access
     description: Single backend serves POSIX (FUSE), HDFS, and S3-compatible clients.
