@@ -1,0 +1,34 @@
+{
+  "provider": "cubefs",
+  "sources": [
+    "cubefs-acls-api-openapi.yml",
+    "cubefs-buckets-api-openapi.yml",
+    "cubefs-cluster-api-openapi.yml",
+    "cubefs-datanodes-api-openapi.yml",
+    "cubefs-datapartitions-api-openapi.yml",
+    "cubefs-metanodes-api-openapi.yml",
+    "cubefs-metapartitions-api-openapi.yml",
+    "cubefs-multipart-api-openapi.yml",
+    "cubefs-objects-api-openapi.yml",
+    "cubefs-users-api-openapi.yml",
+    "cubefs-volumes-api-openapi.yml"
+  ],
+  "outputs": [
+    "cubefs-acls-api-openapi.yml",
+    "cubefs-buckets-api-openapi.yml",
+    "cubefs-cluster-api-openapi.yml",
+    "cubefs-datanodes-api-openapi.yml",
+    "cubefs-datapartitions-api-openapi.yml",
+    "cubefs-metanodes-api-openapi.yml",
+    "cubefs-metapartitions-api-openapi.yml",
+    "cubefs-multipart-api-openapi.yml",
+    "cubefs-objects-api-openapi.yml",
+    "cubefs-users-api-openapi.yml",
+    "cubefs-volumes-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
