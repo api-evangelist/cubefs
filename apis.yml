@@ -319,6 +319,19 @@ useCases:
   - name: Hot/Cold Tiering
     description: Replicated tier for hot data and erasure-coded tier for cold data.
 common:
+  - type: IssueTracker
+    url: https://github.com/cubefs/cubefs/issues
+  - type: Releases
+    url: https://github.com/cubefs/cubefs/releases
+  - type: SecurityPolicy
+    url: https://github.com/cubefs/cubefs/blob/master/SECURITY.md
+  - type: CodeOfConduct
+    url: https://github.com/cubefs/cubefs/blob/master/CODE_OF_CONDUCT.md
+  - type: ContributionGuide
+    url: https://github.com/cubefs/cubefs/blob/master/CONTRIBUTING.md
+  - type: License
+    name: Apache-2.0
+    url: https://github.com/cubefs/cubefs/blob/master/LICENSE
   - type: AgenticAccess
     url: agentic-access/cubefs-agentic-access.yml
   - type: DomainSecurity
