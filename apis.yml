@@ -31,7 +31,7 @@ tags:
   - S3 Compatible
   - Storage
 type: Index
-specificationVersion: '0.19'
+specificationVersion: '0.23'
 created: '2026-03-16'
 modified: '2026-05-19'
 apis:
