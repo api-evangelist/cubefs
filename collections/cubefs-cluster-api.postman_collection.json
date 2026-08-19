@@ -1,0 +1,562 @@
+{
+  "item": [
+    {
+      "id": "c22e75b0-aa25-4a84-8f88-f3bd36484ae2",
+      "name": "Cluster",
+      "description": {
+        "content": "Cluster-level operations including retrieving cluster status, topology, and freezing/unfreezing the cluster to control automatic partition creation.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "cbde6d43-30de-467a-833a-21b589d883e7",
+          "name": "CubeFS Get cluster information",
+          "request": {
+            "name": "CubeFS Get cluster information",
+            "description": {
+              "content": "Returns comprehensive information about the CubeFS cluster including the list of data nodes, metadata nodes, and volumes. Also returns cluster-wide space statistics including total, used, and available capacity across all nodes.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "admin",
+                "getCluster"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8a228acf-4e51-4fa7-98ee-1b81ccbe3484",
+              "name": "Cluster information retrieved successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "admin",
+                    "getCluster"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 3755,\n  \"msg\": \"string\",\n  \"data\": {\n    \"Name\": \"string\",\n    \"LeaderAddr\": \"string\",\n    \"DisableAutoAlloc\": true,\n    \"Applied\": 472,\n    \"MaxDataPartitionID\": 3227,\n    \"MaxMetaPartitionID\": 2499,\n    \"DataNodeStatInfo\": {\n      \"TotalGB\": 3708.5739824318566,\n      \"UsedGB\": 1253.9119853204606,\n      \"IncreaseGB\": 9634.268105648445,\n      \"UsedRatio\": \"string\"\n    },\n    \"MetaNodeStatInfo\": {\n      \"TotalGB\": 3198.417962871892,\n      \"UsedGB\": 1072.3338111504754,\n      \"IncreaseGB\": 7970.991790541535,\n      \"UsedRatio\": \"string\"\n    },\n    \"VolStatInfo\": [\n      {\n        \"Name\": \"string\",\n        \"TotalSize\": 175,\n        \"UsedSize\": 4722,\n        \"UsedRatio\": \"string\",\n        \"CacheTotalSize\": 5290,\n        \"CacheUsedSize\": 8978,\n        \"EnableToken\": false\n      },\n      {\n        \"Name\": \"string\",\n        \"TotalSize\": 7967,\n        \"UsedSize\": 7380,\n        \"UsedRatio\": \"string\",\n        \"CacheTotalSize\": 7675,\n        \"CacheUsedSize\": 223,\n        \"EnableToken\": false\n      }\n    ],\n    \"DataNodes\": [\n      {\n        \"Addr\": \"string\",\n        \"Status\": true,\n        \"IsWritable\": false,\n        \"ID\": 4985\n      },\n      {\n        \"Addr\": \"string\",\n        \"Status\": true,\n        \"IsWritable\": true,\n        \"ID\": 1098\n      }\n    ],\n    \"MetaNodes\": [\n      {\n        \"Addr\": \"string\",\n        \"Status\": false,\n        \"IsWritable\": false,\n        \"ID\": 9784\n      },\n      {\n        \"Addr\": \"string\",\n        \"Status\": false,\n        \"IsWritable\": false,\n        \"ID\": 1097\n      }\n    ]\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b906f73e-d1c4-4a96-be13-453d4383261b",
+              "name": "Authentication credentials are missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "admin",
+                    "getCluster"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5051,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "be2cfe5c-bf91-42fc-b697-acf3841fb311",
+          "name": "CubeFS Get cluster statistics",
+          "request": {
+            "name": "CubeFS Get cluster statistics",
+            "description": {
+              "content": "Returns space usage statistics for the CubeFS cluster broken down by region. Includes TotalGB, UsedGB, IncreaseGB, UsedRatio metrics for both data nodes and metadata nodes.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cluster",
+                "stat"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "5f1c2557-a311-43c6-847d-37e4f7947ff5",
+              "name": "Cluster statistics retrieved successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cluster",
+                    "stat"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5657,\n  \"msg\": \"string\",\n  \"data\": {\n    \"DataNodeStatInfo\": {\n      \"TotalGB\": 1371.291936974144,\n      \"UsedGB\": 107.37171202489071,\n      \"IncreaseGB\": 8756.029281397039,\n      \"UsedRatio\": \"string\"\n    },\n    \"MetaNodeStatInfo\": {\n      \"TotalGB\": 4087.594263940112,\n      \"UsedGB\": 701.9825051382234,\n      \"IncreaseGB\": 345.108062173195,\n      \"UsedRatio\": \"string\"\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1bbfc802-92b5-4fad-8f4e-56a62b21c572",
+              "name": "Authentication credentials are missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cluster",
+                    "stat"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5051,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "53b33a75-07c9-45ff-9518-b130a265cab3",
+          "name": "CubeFS Freeze or unfreeze the cluster",
+          "request": {
+            "name": "CubeFS Freeze or unfreeze the cluster",
+            "description": {
+              "content": "Freezes or unfreezes the cluster. When frozen, volumes will no longer automatically create data or metadata partitions. This is used during maintenance operations to prevent new partition creation.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "cluster",
+                "freeze"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "enable",
+                  "value": "<string>",
+                  "description": "(Required) Set to true to freeze the cluster or false to unfreeze it."
+                }
+              ],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "d03f28d5-2add-4f62-ad3d-f23e8487573c",
+              "name": "Cluster freeze state updated successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cluster",
+                    "freeze"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "enable",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7521,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0a5debaa-8695-4db1-b362-bbae8d97b784",
+              "name": "The request was malformed or missing required parameters.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cluster",
+                    "freeze"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "enable",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5051,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "dc11d611-1615-445b-afa5-fb1993e0d687",
+              "name": "Authentication credentials are missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "cluster",
+                    "freeze"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "enable",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5051,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "IP address or hostname of the CubeFS Master node.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "127.0.0.1",
+      "key": "masterHost"
+    },
+    {
+      "description": {
+        "content": "Listening port of the CubeFS Master node.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "17010",
+      "key": "masterPort"
+    },
+    {
+      "type": "string",
+      "value": "http://{{masterHost}}:{{masterPort}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "073f1df1-818c-42d4-8dfa-36ba52ca3e23",
+    "name": "CubeFS Master ACLs Cluster API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.\n\nContact Support:\n Name: CubeFS Community",
+      "type": "text/plain"
+    }
+  }
+}

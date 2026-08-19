@@ -1,0 +1,812 @@
+{
+  "item": [
+    {
+      "id": "90cf56b0-e13e-420a-a0c0-c7116972c8a0",
+      "name": "MetaNodes",
+      "description": {
+        "content": "Metadata node management operations including listing nodes, querying node status, decommissioning nodes, and managing metadata partitions.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9a5de443-f8a3-4c4b-9956-8b96103280a0",
+          "name": "CubeFS Add a metadata node",
+          "request": {
+            "name": "CubeFS Add a metadata node",
+            "description": {
+              "content": "Registers a new metadata node with the cluster at the specified address. The metadata node must already be running and accessible before it can join the cluster.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "metaNode",
+                "add"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "addr",
+                  "value": "<string>",
+                  "description": "(Required) Address of the metadata node in host:port format."
+                }
+              ],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "1521de4a-2ac1-46a9-a31f-0a8d2b435135",
+              "name": "Metadata node added successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "add"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5968,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e164ddf6-7254-421e-82e2-2bf00a2b8e68",
+              "name": "The request was malformed or missing required parameters.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "add"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "fbc8625e-8e1f-49fd-b171-eb69cf06f7b3",
+              "name": "Authentication credentials are missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "add"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "a3f95f65-4c63-4b89-86a7-12ead75c3dca",
+          "name": "CubeFS Get metadata node information",
+          "request": {
+            "name": "CubeFS Get metadata node information",
+            "description": {
+              "content": "Returns detailed information about a specific metadata node including its address, status, memory usage, metadata partition list, and available capacity.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "metaNode",
+                "get"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "addr",
+                  "value": "<string>",
+                  "description": "(Required) Address of the metadata node in host:port format."
+                }
+              ],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8bde297e-f34a-4626-8ad2-cedf1a768e2a",
+              "name": "Metadata node information retrieved successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "get"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 3658,\n  \"msg\": \"string\",\n  \"data\": {\n    \"Addr\": \"string\",\n    \"Status\": true,\n    \"TotalWeight\": 5011,\n    \"UsedWeight\": 8317,\n    \"MetaPartitionCount\": 3477\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b27f1254-10f3-4923-8702-5d2aa5b38fac",
+              "name": "The request was malformed or missing required parameters.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "get"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "d4201f72-b92b-4730-80d6-21f4ca44f45b",
+              "name": "Authentication credentials are missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "get"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f3e8d5f5-3eec-4927-b992-b3b207807fae",
+              "name": "The requested resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "get"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "e2ab6f75-ef1d-4fa3-95e5-919ce5b1dbf2",
+          "name": "CubeFS Decommission a metadata node",
+          "request": {
+            "name": "CubeFS Decommission a metadata node",
+            "description": {
+              "content": "Removes a metadata node from the cluster. All metadata partitions on the node are asynchronously migrated to other available metadata nodes before the node is fully removed.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "metaNode",
+                "decommission"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "addr",
+                  "value": "<string>",
+                  "description": "(Required) Address of the metadata node to decommission in host:port format."
+                }
+              ],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "bd66a392-d2a6-49eb-896b-db2e439ea23f",
+              "name": "Metadata node decommission initiated.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "decommission"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 5968,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a88f2949-23a8-40f7-b1ad-2caeaf88deb1",
+              "name": "The request was malformed or missing required parameters.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "decommission"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f66b17df-6e61-4387-86ab-a90c326d18b3",
+              "name": "Authentication credentials are missing or invalid.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "decommission"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a379ca90-9bbf-4029-8c85-3af4f1d020b3",
+              "name": "The requested resource was not found.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "metaNode",
+                    "decommission"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "addr",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"code\": 7366,\n  \"msg\": \"string\",\n  \"data\": {}\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "IP address or hostname of the CubeFS Master node.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "127.0.0.1",
+      "key": "masterHost"
+    },
+    {
+      "description": {
+        "content": "Listening port of the CubeFS Master node.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "17010",
+      "key": "masterPort"
+    },
+    {
+      "type": "string",
+      "value": "http://{{masterHost}}:{{masterPort}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "e0978700-0311-4ff6-9c71-2341f88e5436",
+    "name": "CubeFS Master ACLs MetaNodes API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.\n\nContact Support:\n Name: CubeFS Community",
+      "type": "text/plain"
+    }
+  }
+}

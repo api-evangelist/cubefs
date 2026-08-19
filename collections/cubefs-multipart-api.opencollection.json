@@ -1,0 +1,142 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs Multipart API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Multipart",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Initiate a multipart upload",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key?uploads",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              }
+            ]
+          },
+          "docs": "Initiates a multipart upload session for a large object. Returns an UploadId that must be included in all subsequent part upload, list, complete, and abort requests for this multipart upload."
+        },
+        {
+          "info": {
+            "name": "CubeFS Complete a multipart upload",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key?uploadId=:uploadId",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              },
+              {
+                "name": "uploadId",
+                "value": "",
+                "type": "query",
+                "description": "Upload ID from the CreateMultipartUpload response."
+              }
+            ]
+          },
+          "docs": "Assembles the previously uploaded parts and completes the multipart upload. The request body must list all parts in order with their part numbers and ETags. The assembled object becomes available for download once this request succeeds."
+        },
+        {
+          "info": {
+            "name": "CubeFS Upload a part",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key?uploadId=:uploadId",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              },
+              {
+                "name": "uploadId",
+                "value": "",
+                "type": "query",
+                "description": "Upload ID from the CreateMultipartUpload response."
+              },
+              {
+                "name": "partNumber",
+                "value": "",
+                "type": "query",
+                "description": "Part number between 1 and 10,000."
+              }
+            ]
+          },
+          "docs": "Uploads a single part in a multipart upload. Parts must be between 5 MB and 5 GB. The part number must be between 1 and 10,000. Returns an ETag for the part that must be included when completing the upload."
+        },
+        {
+          "info": {
+            "name": "CubeFS Abort a multipart upload",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key?uploadId=:uploadId",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              },
+              {
+                "name": "uploadId",
+                "value": "",
+                "type": "query",
+                "description": "Upload ID from the CreateMultipartUpload response."
+              }
+            ]
+          },
+          "docs": "Aborts an in-progress multipart upload and frees all storage consumed by previously uploaded parts. After aborting, no additional parts can be uploaded for this UploadId."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

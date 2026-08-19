@@ -1,0 +1,68 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs DataPartitions API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "DataPartitions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a data partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataPartition/create",
+            "params": [
+              {
+                "name": "count",
+                "value": "",
+                "type": "query",
+                "description": "Number of data partitions to create."
+              },
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to create data partitions for."
+              }
+            ]
+          },
+          "docs": "Manually creates a data partition for a specific volume. This is typically done automatically by the Master when volume usage exceeds thresholds, but can be triggered manually when the cluster is frozen or for operational purposes."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a data partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataPartition/decommission",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "query",
+                "description": "ID of the data partition to decommission."
+              },
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node hosting the partition to migrate away from."
+              }
+            ]
+          },
+          "docs": "Migrates a specific data partition from a given data node to another available data node. Used to drain a node before decommissioning or to rebalance data distribution."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

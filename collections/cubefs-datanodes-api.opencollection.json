@@ -1,0 +1,75 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs DataNodes API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "DataNodes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Add a data node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataNode/add",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node in host:port format."
+              }
+            ]
+          },
+          "docs": "Registers a new data node with the cluster at the specified address. The data node must already be running and accessible at the given address before it can be added to the cluster."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get data node information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataNode/get",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node in host:port format."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific data node including its address, status, available capacity, used capacity, data partition list, and disk information."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a data node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/dataNode/decommission",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the data node to decommission in host:port format."
+              }
+            ]
+          },
+          "docs": "Removes a data node from the cluster. All data partitions on the node are asynchronously migrated to other available data nodes before the node is fully removed. This is a safe operation for draining a node during maintenance or replacement."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,991 @@
+{
+  "item": [
+    {
+      "id": "645cd069-178b-473a-bdeb-e47a31cf0d21",
+      "name": "Buckets",
+      "description": {
+        "content": "Bucket-level operations including creating, listing, and deleting buckets. In CubeFS, each S3 bucket corresponds to a CubeFS volume. Bucket names must be unique within the cluster.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "8286ad64-3f45-46a6-a799-fd53e4adf8dd",
+          "name": "CubeFS List buckets",
+          "request": {
+            "name": "CubeFS List buckets",
+            "description": {
+              "content": "Returns a list of all buckets owned by the authenticated user. Each bucket corresponds to a CubeFS volume. The response includes the bucket name and creation date.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                ""
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/xml"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "5448cd9c-c883-4140-85fe-8a0de846d84a",
+              "name": "Bucket list retrieved successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Owner>\n    <ID>(string)</ID>\n    <DisplayName>(string)</DisplayName>\n  </Owner>\n  <Buckets>\n    <Bucket>\n      <Name>(string)</Name>\n      <CreationDate>(string)</CreationDate>\n    </Bucket>\n    <Bucket>\n      <Name>(string)</Name>\n      <CreationDate>(string)</CreationDate>\n    </Bucket>\n  </Buckets>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            },
+            {
+              "id": "c20f8e6e-3aa4-435c-a632-c5a57b2eed83",
+              "name": "Authentication credentials are missing, invalid, or the signature does not match.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ""
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "2bad3d4c-4d76-4b9c-a894-eb80d5b40197",
+          "name": "CubeFS Create a bucket",
+          "request": {
+            "name": "CubeFS Create a bucket",
+            "description": {
+              "content": "Creates a new S3 bucket, which corresponds to creating a new CubeFS volume. The bucket name becomes the volume name. The request may include a LocationConstraint to specify the storage region.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                ":bucket"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "bucket",
+                  "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                },
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/xml"
+              },
+              {
+                "key": "Accept",
+                "value": "application/xml"
+              }
+            ],
+            "method": "PUT",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <LocationConstraint>(string)</LocationConstraint>\n</element>",
+              "options": {
+                "raw": {
+                  "language": "xml"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "1f312458-5644-472a-b74b-e5f82278bc42",
+              "name": "Bucket created successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <LocationConstraint>(string)</LocationConstraint>\n</element>",
+                  "options": {
+                    "raw": {
+                      "language": "xml"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "c488988f-fee8-4d01-9775-623b6877e219",
+              "name": "The request was malformed or contained invalid parameters.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <LocationConstraint>(string)</LocationConstraint>\n</element>",
+                  "options": {
+                    "raw": {
+                      "language": "xml"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            },
+            {
+              "id": "6957b595-b272-41da-8422-d375836c600f",
+              "name": "Authentication credentials are missing, invalid, or the signature does not match.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <LocationConstraint>(string)</LocationConstraint>\n</element>",
+                  "options": {
+                    "raw": {
+                      "language": "xml"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            },
+            {
+              "id": "4974b2a3-3fa6-4d88-b51f-dc16e09057ac",
+              "name": "A conflict occurred, such as a bucket already existing or not being empty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "PUT",
+                "body": {
+                  "mode": "raw",
+                  "raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <LocationConstraint>(string)</LocationConstraint>\n</element>",
+                  "options": {
+                    "raw": {
+                      "language": "xml"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ddb3780c-ac60-450c-a893-8fcfce71b65c",
+          "name": "CubeFS Check if a bucket exists",
+          "request": {
+            "name": "CubeFS Check if a bucket exists",
+            "description": {
+              "content": "Checks whether a bucket exists and the caller has permission to access it. Returns 200 if the bucket exists and is accessible, 404 if it does not exist, or 403 if access is denied.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                ":bucket"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "bucket",
+                  "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                },
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/xml"
+              }
+            ],
+            "method": "HEAD",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "35161ba8-ad85-4ab1-88ac-c1111fc12000",
+              "name": "Bucket exists and is accessible.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "method": "HEAD",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "5b383889-a67d-4fba-8f23-4536fe2dba9b",
+              "name": "Authentication credentials are missing, invalid, or the signature does not match.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "HEAD",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            },
+            {
+              "id": "b49d3f0f-07e0-4773-810d-2fe2d39e42bd",
+              "name": "The specified bucket or object does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "HEAD",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ea52b56c-be48-437a-8c3b-d49e4001b14a",
+          "name": "CubeFS Delete a bucket",
+          "request": {
+            "name": "CubeFS Delete a bucket",
+            "description": {
+              "content": "Deletes an empty S3 bucket. The bucket must be empty before deletion. Attempting to delete a non-empty bucket returns a 409 BucketNotEmpty error.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                ":bucket"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "bucket",
+                  "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                },
+                {
+                  "description": "IP address or hostname of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterHost}}",
+                  "key": "masterHost"
+                },
+                {
+                  "description": "Listening port of the CubeFS Master node.",
+                  "type": "any",
+                  "value": "{{masterPort}}",
+                  "key": "masterPort"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/xml"
+              }
+            ],
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "3d522578-c9ec-406b-a5e2-4e98189ac9eb",
+              "name": "Bucket deleted successfully.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "No Content",
+              "code": 204,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "597ef6eb-7bfa-423a-8103-16a0cb029110",
+              "name": "Authentication credentials are missing, invalid, or the signature does not match.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            },
+            {
+              "id": "d3317851-4d1c-4ca1-b915-170a97f69983",
+              "name": "The specified bucket or object does not exist.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            },
+            {
+              "id": "f835c189-a5de-4487-8343-6fb4fc8460e4",
+              "name": "A conflict occurred, such as a bucket already existing or not being empty.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ":bucket"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "bucket",
+                      "description": "(Required) Name of the S3 bucket (corresponds to a CubeFS volume name)."
+                    },
+                    {
+                      "description": "IP address or hostname of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterHost}}",
+                      "key": "masterHost"
+                    },
+                    {
+                      "description": "Listening port of the CubeFS Master node.",
+                      "type": "any",
+                      "value": "{{masterPort}}",
+                      "key": "masterPort"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/xml"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/xml"
+                }
+              ],
+              "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<element>\n  <Code>(string)</Code>\n  <Message>(string)</Message>\n  <Resource>(string)</Resource>\n  <RequestId>(string)</RequestId>\n</element>",
+              "cookie": [],
+              "_postman_previewlanguage": "xml"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "IP address or hostname of the CubeFS Master node.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "127.0.0.1",
+      "key": "masterHost"
+    },
+    {
+      "description": {
+        "content": "Listening port of the CubeFS Master node.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "17010",
+      "key": "masterPort"
+    },
+    {
+      "type": "string",
+      "value": "http://{{masterHost}}:{{masterPort}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "96bea9d4-2028-4399-b831-ba61956cdc16",
+    "name": "CubeFS Master ACLs Buckets API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.\n\nContact Support:\n Name: CubeFS Community",
+      "type": "text/plain"
+    }
+  }
+}

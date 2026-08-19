@@ -1,0 +1,59 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs Cluster API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Cluster",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Get cluster information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/getCluster"
+          },
+          "docs": "Returns comprehensive information about the CubeFS cluster including the list of data nodes, metadata nodes, and volumes. Also returns cluster-wide space statistics including total, used, and available capacity across all nodes."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get cluster statistics",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/cluster/stat"
+          },
+          "docs": "Returns space usage statistics for the CubeFS cluster broken down by region. Includes TotalGB, UsedGB, IncreaseGB, UsedRatio metrics for both data nodes and metadata nodes."
+        },
+        {
+          "info": {
+            "name": "CubeFS Freeze or unfreeze the cluster",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/cluster/freeze",
+            "params": [
+              {
+                "name": "enable",
+                "value": "",
+                "type": "query",
+                "description": "Set to true to freeze the cluster or false to unfreeze it."
+              }
+            ]
+          },
+          "docs": "Freezes or unfreezes the cluster. When frozen, volumes will no longer automatically create data or metadata partitions. This is used during maintenance operations to prevent new partition creation."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

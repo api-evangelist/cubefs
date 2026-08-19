@@ -1,0 +1,75 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs MetaNodes API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "MetaNodes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Add a metadata node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaNode/add",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node in host:port format."
+              }
+            ]
+          },
+          "docs": "Registers a new metadata node with the cluster at the specified address. The metadata node must already be running and accessible before it can join the cluster."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get metadata node information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaNode/get",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node in host:port format."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific metadata node including its address, status, memory usage, metadata partition list, and available capacity."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a metadata node",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaNode/decommission",
+            "params": [
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node to decommission in host:port format."
+              }
+            ]
+          },
+          "docs": "Removes a metadata node from the cluster. All metadata partitions on the node are asynchronously migrated to other available metadata nodes before the node is fully removed."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,105 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs Users API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "http://{masterHost}:{masterPort}/user/create",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new CubeFS user for multi-tenancy and object storage access. Users can be assigned an access key and secret key for S3-compatible API operations. User types include normal (0) and admin (1)."
+        },
+        {
+          "info": {
+            "name": "CubeFS Delete a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/user/delete",
+            "params": [
+              {
+                "name": "user",
+                "value": "",
+                "type": "query",
+                "description": "User ID to delete."
+              }
+            ]
+          },
+          "docs": "Removes a user from the CubeFS cluster. The user must not own any volumes before deletion. All access permissions associated with the user are also removed."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get user information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/user/info",
+            "params": [
+              {
+                "name": "user",
+                "value": "",
+                "type": "query",
+                "description": "User ID to retrieve."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific user including their access key, secret key, list of owned volumes, and volume permissions."
+        },
+        {
+          "info": {
+            "name": "CubeFS List users",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/user/list",
+            "params": [
+              {
+                "name": "keywords",
+                "value": "",
+                "type": "query",
+                "description": "Substring filter for user IDs."
+              }
+            ]
+          },
+          "docs": "Returns a list of all users in the CubeFS cluster. Results can be filtered by keyword to match user IDs containing the specified substring."
+        },
+        {
+          "info": {
+            "name": "CubeFS Update user volume permissions",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "http://{masterHost}:{masterPort}/user/updatePolicy",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Grants or revokes a user's access permissions on a specific volume. Permission values are READONLY (read-only access), READWRITE (full read/write access), or NONE (removes all permissions)."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

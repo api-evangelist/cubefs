@@ -1,0 +1,62 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs MetaPartitions API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "MetaPartitions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a metadata partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaPartition/create",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to create metadata partitions for."
+              }
+            ]
+          },
+          "docs": "Manually creates a metadata partition for a specific volume. This is typically triggered when existing metadata partitions approach their inode count limits, but can also be done manually."
+        },
+        {
+          "info": {
+            "name": "CubeFS Decommission a metadata partition",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/metaPartition/decommission",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "query",
+                "description": "ID of the metadata partition to decommission."
+              },
+              {
+                "name": "addr",
+                "value": "",
+                "type": "query",
+                "description": "Address of the metadata node hosting the partition."
+              }
+            ]
+          },
+          "docs": "Migrates a metadata partition from a given metadata node to another available node. Used to drain a metadata node before decommissioning or to rebalance metadata distribution."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

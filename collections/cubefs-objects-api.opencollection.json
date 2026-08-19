@@ -1,0 +1,195 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs Objects API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Objects",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS List objects in a bucket",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/:bucket",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "prefix",
+                "value": "",
+                "type": "query",
+                "description": "Only return objects whose keys begin with this prefix."
+              },
+              {
+                "name": "delimiter",
+                "value": "",
+                "type": "query",
+                "description": "Character used to group keys. Keys with the same string between the prefix and the first occurrence of the delimiter are grouped under a common prefix."
+              },
+              {
+                "name": "max-keys",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of objects to return. Defaults to 1000."
+              },
+              {
+                "name": "continuation-token",
+                "value": "",
+                "type": "query",
+                "description": "Continuation token for paginating through large result sets."
+              },
+              {
+                "name": "list-type",
+                "value": "",
+                "type": "query",
+                "description": "Set to 2 to use the List Objects V2 format with continuation tokens."
+              }
+            ]
+          },
+          "docs": "Returns a list of objects in a bucket. Supports prefix filtering, delimiter-based grouping for simulating directory hierarchies, and pagination via continuation tokens. Returns up to 1000 objects per request by default."
+        },
+        {
+          "info": {
+            "name": "CubeFS Download an object",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key",
+            "headers": [
+              {
+                "name": "Range",
+                "value": ""
+              },
+              {
+                "name": "If-Match",
+                "value": ""
+              },
+              {
+                "name": "If-Modified-Since",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              }
+            ]
+          },
+          "docs": "Downloads the content of an object from the specified bucket at the given key. Supports range requests for partial content downloads and conditional requests based on ETag or modification time."
+        },
+        {
+          "info": {
+            "name": "CubeFS Upload an object",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": ""
+              },
+              {
+                "name": "Content-MD5",
+                "value": ""
+              },
+              {
+                "name": "x-amz-acl",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              }
+            ]
+          },
+          "docs": "Uploads an object to the specified bucket at the given key path. The object data is provided in the request body. The Content-Type and Content-Length headers should be set appropriately. Server-side encryption, metadata, and ACL settings can be specified via headers."
+        },
+        {
+          "info": {
+            "name": "CubeFS Delete an object",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              }
+            ]
+          },
+          "docs": "Deletes a single object from a bucket. The operation is idempotent — deleting a non-existent object returns a 204 with no error."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get object metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "HEAD",
+            "url": "http://{masterHost}:{masterPort}/:bucket/:key",
+            "params": [
+              {
+                "name": "bucket",
+                "value": "",
+                "type": "path",
+                "description": "Name of the S3 bucket (corresponds to a CubeFS volume name)."
+              },
+              {
+                "name": "key",
+                "value": "",
+                "type": "path",
+                "description": "Object key (path within the bucket). Use forward slashes to simulate directory hierarchies."
+              }
+            ]
+          },
+          "docs": "Returns metadata for the specified object without downloading its content. Returns the same headers as GetObject but with an empty body. Useful for checking existence, size, and ETag before downloading."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

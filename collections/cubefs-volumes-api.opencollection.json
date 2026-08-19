@@ -1,0 +1,240 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "CubeFS Master ACLs Volumes API",
+    "version": "3.3"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Volumes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "CubeFS Create a volume",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/createVol",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Unique name for the new volume."
+              },
+              {
+                "name": "capacity",
+                "value": "",
+                "type": "query",
+                "description": "Capacity of the volume in GB."
+              },
+              {
+                "name": "owner",
+                "value": "",
+                "type": "query",
+                "description": "User ID that owns this volume. Creates the user if they do not exist."
+              },
+              {
+                "name": "mpCount",
+                "value": "",
+                "type": "query",
+                "description": "Initial number of metadata partitions. Defaults to 3."
+              },
+              {
+                "name": "dpCount",
+                "value": "",
+                "type": "query",
+                "description": "Initial number of data partitions. Defaults to 10."
+              },
+              {
+                "name": "replicaNum",
+                "value": "",
+                "type": "query",
+                "description": "Replication factor for data partitions. Defaults to 3."
+              },
+              {
+                "name": "followerRead",
+                "value": "",
+                "type": "query",
+                "description": "Whether follower replicas can serve read requests."
+              },
+              {
+                "name": "enablePosixAcl",
+                "value": "",
+                "type": "query",
+                "description": "Whether POSIX ACL is enabled for this volume."
+              },
+              {
+                "name": "volType",
+                "value": "",
+                "type": "query",
+                "description": "Volume type. 0 for replicated, 1 for erasure coded."
+              },
+              {
+                "name": "qosEnable",
+                "value": "",
+                "type": "query",
+                "description": "Whether QoS (quality of service) throttling is enabled."
+              }
+            ]
+          },
+          "docs": "Creates a new CubeFS volume with the specified configuration. Volumes are the top-level namespace for storing data. When created, CubeFS allocates 10 data partitions and 3 metadata partitions by default. If no user matching the owner ID exists, a new user is automatically created with that ID. The volume can be configured for replication or erasure coding."
+        },
+        {
+          "info": {
+            "name": "CubeFS Get volume information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/getVol",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to retrieve."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              }
+            ]
+          },
+          "docs": "Returns detailed information about a specific volume including its name, owner, capacity, replication configuration, data partition list, metadata partition list, and current status."
+        },
+        {
+          "info": {
+            "name": "CubeFS List volumes",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/admin/listVols",
+            "params": [
+              {
+                "name": "keywords",
+                "value": "",
+                "type": "query",
+                "description": "Substring filter for volume names."
+              }
+            ]
+          },
+          "docs": "Returns a list of all volumes in the cluster. The results can be filtered by keyword to match volume names containing the specified substring."
+        },
+        {
+          "info": {
+            "name": "CubeFS Update volume configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/vol/update",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to update."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              },
+              {
+                "name": "capacity",
+                "value": "",
+                "type": "query",
+                "description": "New capacity in GB for the volume."
+              },
+              {
+                "name": "followerRead",
+                "value": "",
+                "type": "query",
+                "description": "Enable or disable follower reads."
+              },
+              {
+                "name": "replicaNum",
+                "value": "",
+                "type": "query",
+                "description": "New replication factor for the volume."
+              },
+              {
+                "name": "enablePosixAcl",
+                "value": "",
+                "type": "query",
+                "description": "Enable or disable POSIX ACL."
+              }
+            ]
+          },
+          "docs": "Updates configuration parameters for an existing volume including capacity, replication settings, QoS parameters, follower read policy, and access control settings."
+        },
+        {
+          "info": {
+            "name": "CubeFS Delete a volume",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/vol/delete",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to delete."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              }
+            ]
+          },
+          "docs": "Marks a volume for deletion. The volume is first logically deleted by setting its status to deleted, then all data and metadata partitions are asynchronously removed via periodic tasks. Erasure-coded volumes can only be deleted when their used size is 0."
+        },
+        {
+          "info": {
+            "name": "CubeFS Expand volume capacity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{masterHost}:{masterPort}/vol/expand",
+            "params": [
+              {
+                "name": "name",
+                "value": "",
+                "type": "query",
+                "description": "Name of the volume to expand."
+              },
+              {
+                "name": "authKey",
+                "value": "",
+                "type": "query",
+                "description": "MD5 of the owner's user ID for authentication."
+              },
+              {
+                "name": "capacity",
+                "value": "",
+                "type": "query",
+                "description": "New capacity in GB. Must be greater than current capacity."
+              }
+            ]
+          },
+          "docs": "Expands the storage capacity of a volume to the specified size in GB. The new capacity must be larger than the current capacity. CubeFS will automatically allocate additional data partitions as needed."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
