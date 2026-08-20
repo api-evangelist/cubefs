@@ -22,6 +22,15 @@ accessModel:
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/cubefs.png
 tags:
+  - Cloud-Native
+  - CNCF Graduated
+  - Distributed File System
+  - Kubernetes
+  - Object Storage
+  - POSIX
+  - S3 Compatible
+  - Storage
+tags_raw:
   - Cloud Native
   - CNCF Graduated
   - Distributed File System
@@ -42,6 +51,8 @@ apis:
     access at the bucket and object level.
   humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
   tags:
+  - ACL
+  tags_raw:
   - ACLs
   properties:
   - type: OpenAPI
@@ -249,6 +260,8 @@ apis:
     keys and secret keys for S3-compatible object storage operations.
   humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
