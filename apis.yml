@@ -7,6 +7,19 @@ description: >-
   storage protocols. It provides multi-tenancy, multi-AZ deployment, cross-region replication, and erasure coding for
   both hot and cold data tiers, and is widely used to back cloud-native AI training, big-data analytics, and container
   storage workloads.
+deliveryModel:
+  model: self-hosted
+  license: Apache-2.0
+  open_source: true
+  commercial: false
+  callable_host: false
+  label: Self-hosted open source · you run it yourself
+  confidence: high
+  source:
+  - license
+  - openapi
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: self-serve
