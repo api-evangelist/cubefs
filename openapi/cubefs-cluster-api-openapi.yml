@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: CubeFS Master ACLs Cluster API
+  title: CubeFS Master Cluster API
   description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
   version: '3.3'
   contact:
@@ -82,59 +82,22 @@ paths:
           $ref: '#/components/responses/Unauthorized'
 components:
   schemas:
-    NodeStatInfo:
+    NodeView:
       type: object
-      description: Space usage statistics for a set of nodes.
+      description: Summary view of a data or metadata node.
       properties:
-        TotalGB:
-          type: number
-          description: Total storage capacity in gigabytes.
-        UsedGB:
-          type: number
-          description: Used storage in gigabytes.
-        IncreaseGB:
-          type: number
-          description: Storage increase since last measurement in gigabytes.
-        UsedRatio:
+        Addr:
           type: string
-          description: Ratio of used to total storage as a decimal string.
-    ErrorResponse:
-      type: object
-      description: Error response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Error code. Non-200 values indicate failure.
-        msg:
-          type: string
-          description: Human-readable error message.
-        data:
-          description: Additional error context, may be null or empty.
-    VolStatInfo:
-      type: object
-      description: Storage statistics for a single volume.
-      properties:
-        Name:
-          type: string
-          description: Name of the volume.
-        TotalSize:
-          type: integer
-          description: Total allocated capacity in bytes.
-        UsedSize:
-          type: integer
-          description: Used storage in bytes.
-        UsedRatio:
-          type: string
-          description: Ratio of used to total capacity.
-        CacheTotalSize:
-          type: integer
-          description: Total cache tier capacity in bytes.
-        CacheUsedSize:
-          type: integer
-          description: Used cache tier storage in bytes.
-        EnableToken:
+          description: Address of the node in host:port format.
+        Status:
           type: boolean
-          description: Whether token-based access control is enabled.
+          description: Whether the node is currently active and healthy.
+        IsWritable:
+          type: boolean
+          description: Whether the node can accept write operations.
+        ID:
+          type: integer
+          description: Unique identifier of the node.
     ClusterInfoResponse:
       type: object
       description: Cluster information response including nodes and volumes.
@@ -186,34 +149,6 @@ components:
               description: List of metadata nodes in the cluster.
               items:
                 $ref: '#/components/schemas/NodeView'
-    NodeView:
-      type: object
-      description: Summary view of a data or metadata node.
-      properties:
-        Addr:
-          type: string
-          description: Address of the node in host:port format.
-        Status:
-          type: boolean
-          description: Whether the node is currently active and healthy.
-        IsWritable:
-          type: boolean
-          description: Whether the node can accept write operations.
-        ID:
-          type: integer
-          description: Unique identifier of the node.
-    GeneralResponse:
-      type: object
-      description: General success response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
     ClusterStatResponse:
       type: object
       description: Cluster space statistics response.
@@ -232,6 +167,71 @@ components:
               $ref: '#/components/schemas/NodeStatInfo'
             MetaNodeStatInfo:
               $ref: '#/components/schemas/NodeStatInfo'
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
+    NodeStatInfo:
+      type: object
+      description: Space usage statistics for a set of nodes.
+      properties:
+        TotalGB:
+          type: number
+          description: Total storage capacity in gigabytes.
+        UsedGB:
+          type: number
+          description: Used storage in gigabytes.
+        IncreaseGB:
+          type: number
+          description: Storage increase since last measurement in gigabytes.
+        UsedRatio:
+          type: string
+          description: Ratio of used to total storage as a decimal string.
+    VolStatInfo:
+      type: object
+      description: Storage statistics for a single volume.
+      properties:
+        Name:
+          type: string
+          description: Name of the volume.
+        TotalSize:
+          type: integer
+          description: Total allocated capacity in bytes.
+        UsedSize:
+          type: integer
+          description: Used storage in bytes.
+        UsedRatio:
+          type: string
+          description: Ratio of used to total capacity.
+        CacheTotalSize:
+          type: integer
+          description: Total cache tier capacity in bytes.
+        CacheUsedSize:
+          type: integer
+          description: Used cache tier storage in bytes.
+        EnableToken:
+          type: boolean
+          description: Whether token-based access control is enabled.
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
   responses:
     Unauthorized:
       description: Authentication credentials are missing or invalid.

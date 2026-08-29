@@ -1,21 +1,23 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: CubeFS Master ACLs Buckets API
-  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  title: CubeFS S3-Compatible Buckets API
+  description: The CubeFS ObjectNode provides an S3-compatible object storage interface that allows applications using AWS S3 SDKs and tools to interact with CubeFS storage without modification. The ObjectNode listens on port 17410 by default and supports standard S3 operations including bucket creation and deletion, object CRUD, multipart uploads, access control lists (ACLs), and pre-signed URL generation. Authentication uses AWS Signature Version 4 with access keys and secret keys managed by the CubeFS Master API.
   version: '3.3'
   contact:
     name: CubeFS Community
     url: https://cubefs.io/community/overview.html
 servers:
-- url: http://{masterHost}:{masterPort}
-  description: CubeFS Master node HTTP API server
+- url: http://{objectNodeHost}:{objectNodePort}
+  description: CubeFS ObjectNode S3-compatible API server
   variables:
-    masterHost:
+    objectNodeHost:
       default: 127.0.0.1
-      description: IP address or hostname of the CubeFS Master node.
-    masterPort:
-      default: '17010'
-      description: Listening port of the CubeFS Master node.
+      description: IP address or hostname of the CubeFS ObjectNode.
+    objectNodePort:
+      default: '17410'
+      description: Listening port of the CubeFS ObjectNode.
+security:
+- awsAuth: []
 tags:
 - name: Buckets
   description: Bucket-level operations including creating, listing, and deleting buckets. In CubeFS, each S3 bucket corresponds to a CubeFS volume. Bucket names must be unique within the cluster.
@@ -94,21 +96,16 @@ paths:
           $ref: '#/components/responses/Conflict'
 components:
   schemas:
-    ListAllMyBucketsResult:
+    Owner:
       type: object
-      description: Result of the list buckets operation.
+      description: Owner of a bucket or object.
       properties:
-        Owner:
-          $ref: '#/components/schemas/Owner'
-        Buckets:
-          type: object
-          description: Container for the bucket list.
-          properties:
-            Bucket:
-              type: array
-              description: List of bucket objects.
-              items:
-                $ref: '#/components/schemas/BucketInfo'
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -125,6 +122,21 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
+    ListAllMyBucketsResult:
+      type: object
+      description: Result of the list buckets operation.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        Buckets:
+          type: object
+          description: Container for the bucket list.
+          properties:
+            Bucket:
+              type: array
+              description: List of bucket objects.
+              items:
+                $ref: '#/components/schemas/BucketInfo'
     BucketInfo:
       type: object
       description: Information about an S3 bucket.
@@ -136,16 +148,6 @@ components:
           type: string
           format: date-time
           description: Timestamp when the bucket was created.
-    Owner:
-      type: object
-      description: Owner of a bucket or object.
-      properties:
-        ID:
-          type: string
-          description: CubeFS user ID of the owner.
-        DisplayName:
-          type: string
-          description: Display name of the owner.
     CreateBucketConfiguration:
       type: object
       description: Optional configuration for bucket creation.
@@ -153,31 +155,6 @@ components:
         LocationConstraint:
           type: string
           description: Region or zone where the bucket should be created.
-  responses:
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    Conflict:
-      description: A conflict occurred, such as a bucket already existing or not being empty.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    NotFound:
-      description: The specified bucket or object does not exist.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
   parameters:
     bucket:
       name: bucket
@@ -189,6 +166,37 @@ components:
         minLength: 3
         maxLength: 63
         pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+  responses:
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Conflict:
+      description: A conflict occurred, such as a bucket already existing or not being empty.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+  securitySchemes:
+    awsAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: 'AWS Signature Version 4 authorization. Format: AWS4-HMAC-SHA256 Credential={accessKey}/{date}/{region}/s3/aws4_request, SignedHeaders={headers}, Signature={signature}. Access keys are managed via the CubeFS Master API user management endpoints.'
 externalDocs:
-  description: CubeFS Master Admin API Reference
-  url: https://cubefs.io/docs/master/dev-guide/admin-api/master/
+  description: CubeFS ObjectNode Documentation
+  url: https://cubefs.io/docs/master/user-guide/objectnode.html

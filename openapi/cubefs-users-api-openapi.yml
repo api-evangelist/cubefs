@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: CubeFS Master ACLs Users API
+  title: CubeFS Master Users API
   description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
   version: '3.3'
   contact:
@@ -163,6 +163,44 @@ components:
           description: Response message.
         data:
           $ref: '#/components/schemas/UserInfo'
+    UpdateUserPolicyRequest:
+      type: object
+      description: Request body for updating user volume permissions.
+      required:
+      - user_id
+      - volume
+      - policy
+      properties:
+        user_id:
+          type: string
+          description: User ID to update permissions for.
+        volume:
+          type: string
+          description: Name of the volume to update permissions on.
+        policy:
+          type: string
+          enum:
+          - READONLY
+          - RO
+          - READWRITE
+          - RW
+          - NONE
+          description: Permission level to grant. READONLY/RO grants read-only access; READWRITE/RW grants full read/write access; NONE removes all access.
+    UserListResponse:
+      type: object
+      description: List of users response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: array
+          description: List of user objects.
+          items:
+            $ref: '#/components/schemas/UserInfo'
     UserInfo:
       type: object
       description: CubeFS user account information.
@@ -194,33 +232,6 @@ components:
         create_time:
           type: string
           description: User creation timestamp.
-    ErrorResponse:
-      type: object
-      description: Error response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Error code. Non-200 values indicate failure.
-        msg:
-          type: string
-          description: Human-readable error message.
-        data:
-          description: Additional error context, may be null or empty.
-    UserListResponse:
-      type: object
-      description: List of users response.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message.
-        data:
-          type: array
-          description: List of user objects.
-          items:
-            $ref: '#/components/schemas/UserInfo'
     GeneralResponse:
       type: object
       description: General success response from the CubeFS Master API.
@@ -257,32 +268,21 @@ components:
           - 0
           - 1
           description: User type. 0 for normal user, 1 for admin user.
-    UpdateUserPolicyRequest:
+    ErrorResponse:
       type: object
-      description: Request body for updating user volume permissions.
-      required:
-      - user_id
-      - volume
-      - policy
+      description: Error response from the CubeFS Master API.
       properties:
-        user_id:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
           type: string
-          description: User ID to update permissions for.
-        volume:
-          type: string
-          description: Name of the volume to update permissions on.
-        policy:
-          type: string
-          enum:
-          - READONLY
-          - RO
-          - READWRITE
-          - RW
-          - NONE
-          description: Permission level to grant. READONLY/RO grants read-only access; READWRITE/RW grants full read/write access; NONE removes all access.
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
   responses:
-    Unauthorized:
-      description: Authentication credentials are missing or invalid.
+    NotFound:
+      description: The requested resource was not found.
       content:
         application/json:
           schema:
@@ -293,8 +293,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: The requested resource was not found.
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
       content:
         application/json:
           schema:

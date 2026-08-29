@@ -1,34 +1,41 @@
 {
   "provider": "cubefs",
   "sources": [
-    "cubefs-acls-api-openapi.yml",
-    "cubefs-buckets-api-openapi.yml",
-    "cubefs-cluster-api-openapi.yml",
-    "cubefs-datanodes-api-openapi.yml",
-    "cubefs-datapartitions-api-openapi.yml",
-    "cubefs-metanodes-api-openapi.yml",
-    "cubefs-metapartitions-api-openapi.yml",
-    "cubefs-multipart-api-openapi.yml",
-    "cubefs-objects-api-openapi.yml",
-    "cubefs-users-api-openapi.yml",
-    "cubefs-volumes-api-openapi.yml"
+    "_original/cubefs-master-api-openapi.yml",
+    "_original/cubefs-s3-api-openapi.yml"
   ],
   "outputs": [
-    "cubefs-acls-api-openapi.yml",
-    "cubefs-buckets-api-openapi.yml",
     "cubefs-cluster-api-openapi.yml",
     "cubefs-datanodes-api-openapi.yml",
     "cubefs-datapartitions-api-openapi.yml",
     "cubefs-metanodes-api-openapi.yml",
     "cubefs-metapartitions-api-openapi.yml",
-    "cubefs-multipart-api-openapi.yml",
-    "cubefs-objects-api-openapi.yml",
     "cubefs-users-api-openapi.yml",
-    "cubefs-volumes-api-openapi.yml"
+    "cubefs-volumes-api-openapi.yml",
+    "cubefs-acls-api-openapi.yml",
+    "cubefs-buckets-api-openapi.yml",
+    "cubefs-multipart-api-openapi.yml",
+    "cubefs-objects-api-openapi.yml"
   ],
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "cubefs-master-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "cubefs-s3-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0"
+  ],
+  "skipped": [
+    "cubefs-acls-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-buckets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-cluster-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-datanodes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-datapartitions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-metanodes-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-metapartitions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-multipart-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-objects-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-volumes-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
