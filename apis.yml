@@ -58,31 +58,6 @@ specificationVersion: '0.23'
 created: '2026-03-16'
 modified: '2026-05-19'
 apis:
-- aid: cubefs:cubefs-acls-api
-  name: CubeFS ACLs API
-  description: >-
-    Access control list operations for buckets and objects. Supports getting and setting ACLs to control
-    access at the bucket and object level.
-  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
-  tags:
-  - ACL
-  tags_raw:
-  - ACLs
-  properties:
-  - type: OpenAPI
-    url: openapi/cubefs-acls-api-openapi.yml
-  - type: Documentation
-    url: https://cubefs.io/docs/master/user-guide/objectnode.html
-  - type: GitHubRepository
-    url: https://github.com/cubefs/cubefs
-  - type: SpectralRules
-    url: rules/cubefs-s3-rules.yml
-  - type: Documentation
-    url: https://cubefs.io/docs/master/dev-guide/master-api.html
-  - type: JSONSchema
-    url: json-schema/cubefs-volume-schema.json
-  - type: SpectralRules
-    url: rules/cubefs-master-rules.yml
 - aid: cubefs:cubefs-buckets-api
   name: CubeFS Buckets API
   description: >-
@@ -117,29 +92,6 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/cubefs-cluster-api-openapi.yml
-  - type: Documentation
-    url: https://cubefs.io/docs/master/user-guide/objectnode.html
-  - type: GitHubRepository
-    url: https://github.com/cubefs/cubefs
-  - type: SpectralRules
-    url: rules/cubefs-s3-rules.yml
-  - type: Documentation
-    url: https://cubefs.io/docs/master/dev-guide/master-api.html
-  - type: JSONSchema
-    url: json-schema/cubefs-volume-schema.json
-  - type: SpectralRules
-    url: rules/cubefs-master-rules.yml
-- aid: cubefs:cubefs-datanodes-api
-  name: CubeFS DataNodes API
-  description: >-
-    Data node management operations including listing nodes, querying node status, decommissioning nodes,
-    and managing data partitions on nodes.
-  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
-  tags:
-  - DataNodes
-  properties:
-  - type: OpenAPI
-    url: openapi/cubefs-datanodes-api-openapi.yml
   - type: Documentation
     url: https://cubefs.io/docs/master/user-guide/objectnode.html
   - type: GitHubRepository
@@ -303,6 +255,52 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/cubefs-volumes-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-acls-api
+  name: CubeFS AC Ls API
+  description: >-
+    Access control list operations for buckets and objects. Supports getting and setting ACLs to control
+    access at the bucket and object level.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - ACLs
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-acls-api-openapi.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/user-guide/objectnode.html
+  - type: GitHubRepository
+    url: https://github.com/cubefs/cubefs
+  - type: SpectralRules
+    url: rules/cubefs-s3-rules.yml
+  - type: Documentation
+    url: https://cubefs.io/docs/master/dev-guide/master-api.html
+  - type: JSONSchema
+    url: json-schema/cubefs-volume-schema.json
+  - type: SpectralRules
+    url: rules/cubefs-master-rules.yml
+- aid: cubefs:cubefs-data-nodes-api
+  name: CubeFS Data Nodes API
+  description: >-
+    Data node management operations including listing nodes, querying node status, decommissioning nodes,
+    and managing data partitions on nodes.
+  humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
+  tags:
+  - Data Nodes
+  properties:
+  - type: OpenAPI
+    url: openapi/cubefs-data-nodes-api-openapi.yml
   - type: Documentation
     url: https://cubefs.io/docs/master/user-guide/objectnode.html
   - type: GitHubRepository
