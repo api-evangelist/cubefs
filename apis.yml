@@ -274,6 +274,8 @@ apis:
     access at the bucket and object level.
   humanURL: https://cubefs.io/docs/master/user-guide/objectnode.html
   tags:
+  - ACL
+  tags_raw:
   - ACLs
   properties:
   - type: OpenAPI
