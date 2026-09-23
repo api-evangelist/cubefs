@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: CubeFS Master Users API
-  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster.
   version: '3.3'
   contact:
     name: CubeFS Community
@@ -163,6 +163,45 @@ components:
           description: Response message.
         data:
           $ref: '#/components/schemas/UserInfo'
+    CreateUserRequest:
+      type: object
+      description: Request body for creating a CubeFS user.
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          description: Unique user identifier.
+        password:
+          type: string
+          description: Optional password for the user.
+        accessKey:
+          type: string
+          description: Optional S3 access key for object storage. Generated automatically if omitted.
+        secretKey:
+          type: string
+          description: Optional S3 secret key. Generated automatically if omitted.
+        userType:
+          type: integer
+          enum:
+          - 0
+          - 1
+          description: User type. 0 for normal user, 1 for admin user.
+    UserListResponse:
+      type: object
+      description: List of users response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: array
+          description: List of user objects.
+          items:
+            $ref: '#/components/schemas/UserInfo'
     UpdateUserPolicyRequest:
       type: object
       description: Request body for updating user volume permissions.
@@ -186,21 +225,6 @@ components:
           - RW
           - NONE
           description: Permission level to grant. READONLY/RO grants read-only access; READWRITE/RW grants full read/write access; NONE removes all access.
-    UserListResponse:
-      type: object
-      description: List of users response.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message.
-        data:
-          type: array
-          description: List of user objects.
-          items:
-            $ref: '#/components/schemas/UserInfo'
     UserInfo:
       type: object
       description: CubeFS user account information.
@@ -232,42 +256,6 @@ components:
         create_time:
           type: string
           description: User creation timestamp.
-    GeneralResponse:
-      type: object
-      description: General success response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
-    CreateUserRequest:
-      type: object
-      description: Request body for creating a CubeFS user.
-      required:
-      - id
-      properties:
-        id:
-          type: string
-          description: Unique user identifier.
-        password:
-          type: string
-          description: Optional password for the user.
-        accessKey:
-          type: string
-          description: Optional S3 access key for object storage. Generated automatically if omitted.
-        secretKey:
-          type: string
-          description: Optional S3 secret key. Generated automatically if omitted.
-        userType:
-          type: integer
-          enum:
-          - 0
-          - 1
-          description: User type. 0 for normal user, 1 for admin user.
     ErrorResponse:
       type: object
       description: Error response from the CubeFS Master API.
@@ -280,15 +268,27 @@ components:
           description: Human-readable error message.
         data:
           description: Additional error context, may be null or empty.
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
   responses:
-    NotFound:
-      description: The requested resource was not found.
+    BadRequest:
+      description: The request was malformed or missing required parameters.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    Conflict:
-      description: A resource with this name or ID already exists.
+    NotFound:
+      description: The requested resource was not found.
       content:
         application/json:
           schema:
@@ -299,8 +299,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    BadRequest:
-      description: The request was malformed or missing required parameters.
+    Conflict:
+      description: A resource with this name or ID already exists.
       content:
         application/json:
           schema:

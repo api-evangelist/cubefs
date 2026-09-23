@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: CubeFS S3-Compatible Buckets API
-  description: The CubeFS ObjectNode provides an S3-compatible object storage interface that allows applications using AWS S3 SDKs and tools to interact with CubeFS storage without modification. The ObjectNode listens on port 17410 by default and supports standard S3 operations including bucket creation and deletion, object CRUD, multipart uploads, access control lists (ACLs), and pre-signed URL generation. Authentication uses AWS Signature Version 4 with access keys and secret keys managed by the CubeFS Master API.
+  description: The CubeFS ObjectNode provides an S3-compatible object storage interface that allows applications using AWS S3 SDKs and tools to interact with CubeFS storage without modification.
   version: '3.3'
   contact:
     name: CubeFS Community
@@ -96,6 +96,21 @@ paths:
           $ref: '#/components/responses/Conflict'
 components:
   schemas:
+    ListAllMyBucketsResult:
+      type: object
+      description: Result of the list buckets operation.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        Buckets:
+          type: object
+          description: Container for the bucket list.
+          properties:
+            Bucket:
+              type: array
+              description: List of bucket objects.
+              items:
+                $ref: '#/components/schemas/BucketInfo'
     Owner:
       type: object
       description: Owner of a bucket or object.
@@ -106,6 +121,17 @@ components:
         DisplayName:
           type: string
           description: Display name of the owner.
+    BucketInfo:
+      type: object
+      description: Information about an S3 bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        CreationDate:
+          type: string
+          format: date-time
+          description: Timestamp when the bucket was created.
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -122,32 +148,6 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
-    ListAllMyBucketsResult:
-      type: object
-      description: Result of the list buckets operation.
-      properties:
-        Owner:
-          $ref: '#/components/schemas/Owner'
-        Buckets:
-          type: object
-          description: Container for the bucket list.
-          properties:
-            Bucket:
-              type: array
-              description: List of bucket objects.
-              items:
-                $ref: '#/components/schemas/BucketInfo'
-    BucketInfo:
-      type: object
-      description: Information about an S3 bucket.
-      properties:
-        Name:
-          type: string
-          description: Name of the bucket.
-        CreationDate:
-          type: string
-          format: date-time
-          description: Timestamp when the bucket was created.
     CreateBucketConfiguration:
       type: object
       description: Optional configuration for bucket creation.
@@ -155,18 +155,19 @@ components:
         LocationConstraint:
           type: string
           description: Region or zone where the bucket should be created.
-  parameters:
-    bucket:
-      name: bucket
-      in: path
-      required: true
-      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 63
-        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
   responses:
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
     NotFound:
       description: The specified bucket or object does not exist.
       content:
@@ -179,18 +180,17 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/S3Error'
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
   securitySchemes:
     awsAuth:
       type: apiKey

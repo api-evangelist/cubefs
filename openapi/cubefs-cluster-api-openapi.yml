@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: CubeFS Master Cluster API
-  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster.
   version: '3.3'
   contact:
     name: CubeFS Community
@@ -81,23 +81,36 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
+  responses:
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
-    NodeView:
+    NodeStatInfo:
       type: object
-      description: Summary view of a data or metadata node.
+      description: Space usage statistics for a set of nodes.
       properties:
-        Addr:
+        TotalGB:
+          type: number
+          description: Total storage capacity in gigabytes.
+        UsedGB:
+          type: number
+          description: Used storage in gigabytes.
+        IncreaseGB:
+          type: number
+          description: Storage increase since last measurement in gigabytes.
+        UsedRatio:
           type: string
-          description: Address of the node in host:port format.
-        Status:
-          type: boolean
-          description: Whether the node is currently active and healthy.
-        IsWritable:
-          type: boolean
-          description: Whether the node can accept write operations.
-        ID:
-          type: integer
-          description: Unique identifier of the node.
+          description: Ratio of used to total storage as a decimal string.
     ClusterInfoResponse:
       type: object
       description: Cluster information response including nodes and volumes.
@@ -149,52 +162,34 @@ components:
               description: List of metadata nodes in the cluster.
               items:
                 $ref: '#/components/schemas/NodeView'
-    ClusterStatResponse:
+    ErrorResponse:
       type: object
-      description: Cluster space statistics response.
+      description: Error response from the CubeFS Master API.
       properties:
         code:
           type: integer
-          description: Response code. 200 indicates success.
+          description: Error code. Non-200 values indicate failure.
         msg:
           type: string
-          description: Response message.
+          description: Human-readable error message.
         data:
-          type: object
-          description: Space statistics broken down by region.
-          properties:
-            DataNodeStatInfo:
-              $ref: '#/components/schemas/NodeStatInfo'
-            MetaNodeStatInfo:
-              $ref: '#/components/schemas/NodeStatInfo'
-    GeneralResponse:
+          description: Additional error context, may be null or empty.
+    NodeView:
       type: object
-      description: General success response from the CubeFS Master API.
+      description: Summary view of a data or metadata node.
       properties:
-        code:
+        Addr:
+          type: string
+          description: Address of the node in host:port format.
+        Status:
+          type: boolean
+          description: Whether the node is currently active and healthy.
+        IsWritable:
+          type: boolean
+          description: Whether the node can accept write operations.
+        ID:
           type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
-    NodeStatInfo:
-      type: object
-      description: Space usage statistics for a set of nodes.
-      properties:
-        TotalGB:
-          type: number
-          description: Total storage capacity in gigabytes.
-        UsedGB:
-          type: number
-          description: Used storage in gigabytes.
-        IncreaseGB:
-          type: number
-          description: Storage increase since last measurement in gigabytes.
-        UsedRatio:
-          type: string
-          description: Ratio of used to total storage as a decimal string.
+          description: Unique identifier of the node.
     VolStatInfo:
       type: object
       description: Storage statistics for a single volume.
@@ -220,31 +215,36 @@ components:
         EnableToken:
           type: boolean
           description: Whether token-based access control is enabled.
-    ErrorResponse:
+    GeneralResponse:
       type: object
-      description: Error response from the CubeFS Master API.
+      description: General success response from the CubeFS Master API.
       properties:
         code:
           type: integer
-          description: Error code. Non-200 values indicate failure.
+          description: Response code. 200 indicates success.
         msg:
           type: string
-          description: Human-readable error message.
+          description: Response message, typically "success".
         data:
-          description: Additional error context, may be null or empty.
-  responses:
-    Unauthorized:
-      description: Authentication credentials are missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    BadRequest:
-      description: The request was malformed or missing required parameters.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+          description: Response data, content varies by operation.
+    ClusterStatResponse:
+      type: object
+      description: Cluster space statistics response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: object
+          description: Space statistics broken down by region.
+          properties:
+            DataNodeStatInfo:
+              $ref: '#/components/schemas/NodeStatInfo'
+            MetaNodeStatInfo:
+              $ref: '#/components/schemas/NodeStatInfo'
 externalDocs:
   description: CubeFS Master Admin API Reference
   url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

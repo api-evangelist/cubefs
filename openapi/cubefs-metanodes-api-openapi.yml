@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: CubeFS Master Meta Nodes API
-  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster. The Master node is the control plane for all cluster operations including volume lifecycle management, data and metadata node administration, user and access key management, and cluster health monitoring. All endpoints are served over HTTP on the Master node's listen port (default 17010) and accept query string parameters. Responses are JSON objects with a code field indicating success (200) or error.
+  description: The CubeFS Master API provides HTTP endpoints for administering a CubeFS distributed storage cluster.
   version: '3.3'
   contact:
     name: CubeFS Community
@@ -100,6 +100,25 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
+  responses:
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     MetaNodeInfoResponse:
       type: object
@@ -130,18 +149,6 @@ components:
             MetaPartitionCount:
               type: integer
               description: Number of metadata partitions on this node.
-    GeneralResponse:
-      type: object
-      description: General success response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
     ErrorResponse:
       type: object
       description: Error response from the CubeFS Master API.
@@ -154,25 +161,18 @@ components:
           description: Human-readable error message.
         data:
           description: Additional error context, may be null or empty.
-  responses:
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Unauthorized:
-      description: Authentication credentials are missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    BadRequest:
-      description: The request was malformed or missing required parameters.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
 externalDocs:
   description: CubeFS Master Admin API Reference
   url: https://cubefs.io/docs/master/dev-guide/admin-api/master/
