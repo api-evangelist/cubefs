@@ -96,6 +96,33 @@ paths:
           $ref: '#/components/responses/Conflict'
 components:
   schemas:
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+    BucketInfo:
+      type: object
+      description: Information about an S3 bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        CreationDate:
+          type: string
+          format: date-time
+          description: Timestamp when the bucket was created.
     ListAllMyBucketsResult:
       type: object
       description: Result of the list buckets operation.
@@ -121,33 +148,6 @@ components:
         DisplayName:
           type: string
           description: Display name of the owner.
-    BucketInfo:
-      type: object
-      description: Information about an S3 bucket.
-      properties:
-        Name:
-          type: string
-          description: Name of the bucket.
-        CreationDate:
-          type: string
-          format: date-time
-          description: Timestamp when the bucket was created.
-    S3Error:
-      type: object
-      description: S3-compatible error response in XML format.
-      properties:
-        Code:
-          type: string
-          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
-        Message:
-          type: string
-          description: Human-readable error message.
-        Resource:
-          type: string
-          description: The bucket or object that the error applies to.
-        RequestId:
-          type: string
-          description: Unique identifier for the request, useful for debugging.
     CreateBucketConfiguration:
       type: object
       description: Optional configuration for bucket creation.
@@ -156,8 +156,8 @@ components:
           type: string
           description: Region or zone where the bucket should be created.
   responses:
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
+    Conflict:
+      description: A conflict occurred, such as a bucket already existing or not being empty.
       content:
         application/xml:
           schema:
@@ -174,8 +174,8 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/S3Error'
-    Conflict:
-      description: A conflict occurred, such as a bucket already existing or not being empty.
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
       content:
         application/xml:
           schema:

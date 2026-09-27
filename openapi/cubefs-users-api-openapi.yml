@@ -151,9 +151,9 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
-    UserInfoResponse:
+    UserListResponse:
       type: object
-      description: User information response.
+      description: List of users response.
       properties:
         code:
           type: integer
@@ -162,7 +162,10 @@ components:
           type: string
           description: Response message.
         data:
-          $ref: '#/components/schemas/UserInfo'
+          type: array
+          description: List of user objects.
+          items:
+            $ref: '#/components/schemas/UserInfo'
     CreateUserRequest:
       type: object
       description: Request body for creating a CubeFS user.
@@ -187,21 +190,6 @@ components:
           - 0
           - 1
           description: User type. 0 for normal user, 1 for admin user.
-    UserListResponse:
-      type: object
-      description: List of users response.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message.
-        data:
-          type: array
-          description: List of user objects.
-          items:
-            $ref: '#/components/schemas/UserInfo'
     UpdateUserPolicyRequest:
       type: object
       description: Request body for updating user volume permissions.
@@ -225,6 +213,18 @@ components:
           - RW
           - NONE
           description: Permission level to grant. READONLY/RO grants read-only access; READWRITE/RW grants full read/write access; NONE removes all access.
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
     UserInfo:
       type: object
       description: CubeFS user account information.
@@ -256,6 +256,18 @@ components:
         create_time:
           type: string
           description: User creation timestamp.
+    UserInfoResponse:
+      type: object
+      description: User information response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          $ref: '#/components/schemas/UserInfo'
     ErrorResponse:
       type: object
       description: Error response from the CubeFS Master API.
@@ -268,27 +280,9 @@ components:
           description: Human-readable error message.
         data:
           description: Additional error context, may be null or empty.
-    GeneralResponse:
-      type: object
-      description: General success response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
   responses:
-    BadRequest:
-      description: The request was malformed or missing required parameters.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: The requested resource was not found.
+    Conflict:
+      description: A resource with this name or ID already exists.
       content:
         application/json:
           schema:
@@ -299,8 +293,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    Conflict:
-      description: A resource with this name or ID already exists.
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: The request was malformed or missing required parameters.
       content:
         application/json:
           schema:

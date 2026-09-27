@@ -313,6 +313,21 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
+    VolumeListResponse:
+      type: object
+      description: List of volumes response.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message.
+        data:
+          type: array
+          description: List of volume summary objects.
+          items:
+            $ref: '#/components/schemas/VolumeView'
     DataPartitionView:
       type: object
       description: Summary of a data partition.
@@ -360,21 +375,18 @@ components:
         MpCnt:
           type: integer
           description: Number of metadata partitions.
-    VolumeListResponse:
+    GeneralResponse:
       type: object
-      description: List of volumes response.
+      description: General success response from the CubeFS Master API.
       properties:
         code:
           type: integer
           description: Response code. 200 indicates success.
         msg:
           type: string
-          description: Response message.
+          description: Response message, typically "success".
         data:
-          type: array
-          description: List of volume summary objects.
-          items:
-            $ref: '#/components/schemas/VolumeView'
+          description: Response data, content varies by operation.
     VolumeInfoResponse:
       type: object
       description: Detailed volume information response.
@@ -387,6 +399,44 @@ components:
           description: Response message.
         data:
           $ref: '#/components/schemas/VolumeInfo'
+    VolumeInfo:
+      type: object
+      description: Detailed information about a CubeFS volume.
+      properties:
+        Name:
+          type: string
+          description: Name of the volume.
+        Owner:
+          type: string
+          description: User ID that owns the volume.
+        Capacity:
+          type: integer
+          description: Total configured capacity in GB.
+        ReplicaNum:
+          type: integer
+          description: Replication factor for data partitions.
+        FollowerRead:
+          type: boolean
+          description: Whether follower replicas can serve reads.
+        Status:
+          type: integer
+          description: Volume status. 0 is normal, 1 is marked for deletion.
+        EnablePosixAcl:
+          type: boolean
+          description: Whether POSIX ACL is enabled.
+        VolType:
+          type: integer
+          description: Volume type. 0 for replicated, 1 for erasure coded.
+        DataPartitions:
+          type: array
+          description: List of data partitions belonging to this volume.
+          items:
+            $ref: '#/components/schemas/DataPartitionView'
+        MetaPartitions:
+          type: array
+          description: List of metadata partitions belonging to this volume.
+          items:
+            $ref: '#/components/schemas/MetaPartitionView'
     MetaPartitionView:
       type: object
       description: Summary of a metadata partition.
@@ -427,63 +477,7 @@ components:
           description: Human-readable error message.
         data:
           description: Additional error context, may be null or empty.
-    VolumeInfo:
-      type: object
-      description: Detailed information about a CubeFS volume.
-      properties:
-        Name:
-          type: string
-          description: Name of the volume.
-        Owner:
-          type: string
-          description: User ID that owns the volume.
-        Capacity:
-          type: integer
-          description: Total configured capacity in GB.
-        ReplicaNum:
-          type: integer
-          description: Replication factor for data partitions.
-        FollowerRead:
-          type: boolean
-          description: Whether follower replicas can serve reads.
-        Status:
-          type: integer
-          description: Volume status. 0 is normal, 1 is marked for deletion.
-        EnablePosixAcl:
-          type: boolean
-          description: Whether POSIX ACL is enabled.
-        VolType:
-          type: integer
-          description: Volume type. 0 for replicated, 1 for erasure coded.
-        DataPartitions:
-          type: array
-          description: List of data partitions belonging to this volume.
-          items:
-            $ref: '#/components/schemas/DataPartitionView'
-        MetaPartitions:
-          type: array
-          description: List of metadata partitions belonging to this volume.
-          items:
-            $ref: '#/components/schemas/MetaPartitionView'
-    GeneralResponse:
-      type: object
-      description: General success response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
   responses:
-    BadRequest:
-      description: The request was malformed or missing required parameters.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
     Unauthorized:
       description: Authentication credentials are missing or invalid.
       content:
@@ -492,6 +486,12 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
     NotFound:
       description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: The request was malformed or missing required parameters.
       content:
         application/json:
           schema:

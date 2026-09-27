@@ -18,7 +18,7 @@
     "cubefs-objects-api-openapi.yml"
   ],
   "archived": [
-    "deleted 2 superseded output(s) from the previous generation"
+    "deleted 1 superseded output(s) from the previous generation"
   ],
   "errors": [],
   "warnings": [],
@@ -26,11 +26,11 @@
     "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "cubefs-master-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "cubefs-s3-api-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "superseded outputs removed: cubefs-ac-ls-api-openapi.yml, cubefs-data-nodes-api-openapi.yml",
-    "apis.yml register: written (+2 apis, 11 total)"
+    "superseded outputs removed: cubefs-data-nodes-api-openapi.yml",
+    "apis.yml register: written (+1 apis, 11 total)"
   ],
   "skipped": [
-    "cubefs-ac-ls-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "cubefs-acls-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "cubefs-buckets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "cubefs-cluster-api-openapi.yml: previously refined output, superseded by openapi/_original/",
     "cubefs-data-nodes-api-openapi.yml: previously refined output, superseded by openapi/_original/",

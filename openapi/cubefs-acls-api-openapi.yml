@@ -1,6 +1,6 @@
 openapi: 3.2.0
 info:
-  title: CubeFS S3-Compatible AC Ls API
+  title: CubeFS S3-Compatible ACLs API
   description: The CubeFS ObjectNode provides an S3-compatible object storage interface that allows applications using AWS S3 SDKs and tools to interact with CubeFS storage without modification.
   version: '3.3'
   contact:
@@ -76,41 +76,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
-  responses:
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    NotFound:
-      description: The specified bucket or object does not exist.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
   schemas:
-    AccessControlPolicy:
-      type: object
-      description: Access control policy for a bucket or object.
-      properties:
-        Owner:
-          $ref: '#/components/schemas/Owner'
-        AccessControlList:
-          type: object
-          description: Container for grant entries.
-          properties:
-            Grant:
-              type: array
-              description: List of access control grants.
-              items:
-                $ref: '#/components/schemas/Grant'
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -127,6 +93,19 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
+    Grantee:
+      type: object
+      description: An entity to whom access is being granted.
+      properties:
+        ID:
+          type: string
+          description: User ID or group identifier.
+        DisplayName:
+          type: string
+          description: Display name of the grantee.
+        Type:
+          type: string
+          description: Type of grantee, typically CanonicalUser or Group.
     Grant:
       type: object
       description: A permission grant in an ACL.
@@ -152,19 +131,40 @@ components:
         DisplayName:
           type: string
           description: Display name of the owner.
-    Grantee:
+    AccessControlPolicy:
       type: object
-      description: An entity to whom access is being granted.
+      description: Access control policy for a bucket or object.
       properties:
-        ID:
-          type: string
-          description: User ID or group identifier.
-        DisplayName:
-          type: string
-          description: Display name of the grantee.
-        Type:
-          type: string
-          description: Type of grantee, typically CanonicalUser or Group.
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        AccessControlList:
+          type: object
+          description: Container for grant entries.
+          properties:
+            Grant:
+              type: array
+              description: List of access control grants.
+              items:
+                $ref: '#/components/schemas/Grant'
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
   parameters:
     bucket:
       name: bucket

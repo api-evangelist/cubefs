@@ -100,25 +100,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
-  responses:
-    BadRequest:
-      description: The request was malformed or missing required parameters.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Unauthorized:
-      description: Authentication credentials are missing or invalid.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    NotFound:
-      description: The requested resource was not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     MetaNodeInfoResponse:
       type: object
@@ -149,18 +130,6 @@ components:
             MetaPartitionCount:
               type: integer
               description: Number of metadata partitions on this node.
-    ErrorResponse:
-      type: object
-      description: Error response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Error code. Non-200 values indicate failure.
-        msg:
-          type: string
-          description: Human-readable error message.
-        data:
-          description: Additional error context, may be null or empty.
     GeneralResponse:
       type: object
       description: General success response from the CubeFS Master API.
@@ -173,6 +142,37 @@ components:
           description: Response message, typically "success".
         data:
           description: Response data, content varies by operation.
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: The requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: The request was malformed or missing required parameters.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 externalDocs:
   description: CubeFS Master Admin API Reference
   url: https://cubefs.io/docs/master/dev-guide/admin-api/master/
