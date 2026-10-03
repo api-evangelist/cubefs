@@ -313,40 +313,18 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
-    VolumeListResponse:
+    ErrorResponse:
       type: object
-      description: List of volumes response.
+      description: Error response from the CubeFS Master API.
       properties:
         code:
           type: integer
-          description: Response code. 200 indicates success.
+          description: Error code. Non-200 values indicate failure.
         msg:
           type: string
-          description: Response message.
+          description: Human-readable error message.
         data:
-          type: array
-          description: List of volume summary objects.
-          items:
-            $ref: '#/components/schemas/VolumeView'
-    DataPartitionView:
-      type: object
-      description: Summary of a data partition.
-      properties:
-        PartitionID:
-          type: integer
-          description: Unique partition identifier.
-        Status:
-          type: integer
-          description: Partition status.
-        ReplicaNum:
-          type: integer
-          description: Number of replicas for this partition.
-        Hosts:
-          type: array
-          description: Data nodes hosting replicas of this partition.
-          items:
-            type: string
-            description: Node address in host:port format.
+          description: Additional error context, may be null or empty.
     VolumeView:
       type: object
       description: Summary view of a CubeFS volume.
@@ -375,18 +353,34 @@ components:
         MpCnt:
           type: integer
           description: Number of metadata partitions.
-    GeneralResponse:
+    MetaPartitionView:
       type: object
-      description: General success response from the CubeFS Master API.
+      description: Summary of a metadata partition.
       properties:
-        code:
+        PartitionID:
           type: integer
-          description: Response code. 200 indicates success.
-        msg:
-          type: string
-          description: Response message, typically "success".
-        data:
-          description: Response data, content varies by operation.
+          description: Unique partition identifier.
+        Start:
+          type: integer
+          description: Start of the inode range for this partition.
+        End:
+          type: integer
+          description: End of the inode range for this partition.
+        InodeCount:
+          type: integer
+          description: Current number of inodes in this partition.
+        MaxInodeID:
+          type: integer
+          description: Highest inode ID in this partition.
+        IsRecover:
+          type: boolean
+          description: Whether this partition is currently recovering.
+        Hosts:
+          type: array
+          description: Metadata nodes hosting this partition.
+          items:
+            type: string
+            description: Node address in host:port format.
     VolumeInfoResponse:
       type: object
       description: Detailed volume information response.
@@ -437,49 +431,55 @@ components:
           description: List of metadata partitions belonging to this volume.
           items:
             $ref: '#/components/schemas/MetaPartitionView'
-    MetaPartitionView:
+    DataPartitionView:
       type: object
-      description: Summary of a metadata partition.
+      description: Summary of a data partition.
       properties:
         PartitionID:
           type: integer
           description: Unique partition identifier.
-        Start:
+        Status:
           type: integer
-          description: Start of the inode range for this partition.
-        End:
+          description: Partition status.
+        ReplicaNum:
           type: integer
-          description: End of the inode range for this partition.
-        InodeCount:
-          type: integer
-          description: Current number of inodes in this partition.
-        MaxInodeID:
-          type: integer
-          description: Highest inode ID in this partition.
-        IsRecover:
-          type: boolean
-          description: Whether this partition is currently recovering.
+          description: Number of replicas for this partition.
         Hosts:
           type: array
-          description: Metadata nodes hosting this partition.
+          description: Data nodes hosting replicas of this partition.
           items:
             type: string
             description: Node address in host:port format.
-    ErrorResponse:
+    VolumeListResponse:
       type: object
-      description: Error response from the CubeFS Master API.
+      description: List of volumes response.
       properties:
         code:
           type: integer
-          description: Error code. Non-200 values indicate failure.
+          description: Response code. 200 indicates success.
         msg:
           type: string
-          description: Human-readable error message.
+          description: Response message.
         data:
-          description: Additional error context, may be null or empty.
+          type: array
+          description: List of volume summary objects.
+          items:
+            $ref: '#/components/schemas/VolumeView'
+    GeneralResponse:
+      type: object
+      description: General success response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Response code. 200 indicates success.
+        msg:
+          type: string
+          description: Response message, typically "success".
+        data:
+          description: Response data, content varies by operation.
   responses:
-    Unauthorized:
-      description: Authentication credentials are missing or invalid.
+    BadRequest:
+      description: The request was malformed or missing required parameters.
       content:
         application/json:
           schema:
@@ -490,8 +490,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    BadRequest:
-      description: The request was malformed or missing required parameters.
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
       content:
         application/json:
           schema:

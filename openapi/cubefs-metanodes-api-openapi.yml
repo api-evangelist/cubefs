@@ -101,6 +101,18 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   schemas:
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
     MetaNodeInfoResponse:
       type: object
       description: Detailed metadata node information response.
@@ -142,21 +154,9 @@ components:
           description: Response message, typically "success".
         data:
           description: Response data, content varies by operation.
-    ErrorResponse:
-      type: object
-      description: Error response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Error code. Non-200 values indicate failure.
-        msg:
-          type: string
-          description: Human-readable error message.
-        data:
-          description: Additional error context, may be null or empty.
   responses:
-    Unauthorized:
-      description: Authentication credentials are missing or invalid.
+    BadRequest:
+      description: The request was malformed or missing required parameters.
       content:
         application/json:
           schema:
@@ -167,8 +167,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    BadRequest:
-      description: The request was malformed or missing required parameters.
+    Unauthorized:
+      description: Authentication credentials are missing or invalid.
       content:
         application/json:
           schema:

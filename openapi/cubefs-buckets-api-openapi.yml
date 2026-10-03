@@ -95,7 +95,61 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 components:
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
   schemas:
+    ListAllMyBucketsResult:
+      type: object
+      description: Result of the list buckets operation.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        Buckets:
+          type: object
+          description: Container for the bucket list.
+          properties:
+            Bucket:
+              type: array
+              description: List of bucket objects.
+              items:
+                $ref: '#/components/schemas/BucketInfo'
+    CreateBucketConfiguration:
+      type: object
+      description: Optional configuration for bucket creation.
+      properties:
+        LocationConstraint:
+          type: string
+          description: Region or zone where the bucket should be created.
+    BucketInfo:
+      type: object
+      description: Information about an S3 bucket.
+      properties:
+        Name:
+          type: string
+          description: Name of the bucket.
+        CreationDate:
+          type: string
+          format: date-time
+          description: Timestamp when the bucket was created.
+    Owner:
+      type: object
+      description: Owner of a bucket or object.
+      properties:
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -112,64 +166,9 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
-    BucketInfo:
-      type: object
-      description: Information about an S3 bucket.
-      properties:
-        Name:
-          type: string
-          description: Name of the bucket.
-        CreationDate:
-          type: string
-          format: date-time
-          description: Timestamp when the bucket was created.
-    ListAllMyBucketsResult:
-      type: object
-      description: Result of the list buckets operation.
-      properties:
-        Owner:
-          $ref: '#/components/schemas/Owner'
-        Buckets:
-          type: object
-          description: Container for the bucket list.
-          properties:
-            Bucket:
-              type: array
-              description: List of bucket objects.
-              items:
-                $ref: '#/components/schemas/BucketInfo'
-    Owner:
-      type: object
-      description: Owner of a bucket or object.
-      properties:
-        ID:
-          type: string
-          description: CubeFS user ID of the owner.
-        DisplayName:
-          type: string
-          description: Display name of the owner.
-    CreateBucketConfiguration:
-      type: object
-      description: Optional configuration for bucket creation.
-      properties:
-        LocationConstraint:
-          type: string
-          description: Region or zone where the bucket should be created.
   responses:
     Conflict:
       description: A conflict occurred, such as a bucket already existing or not being empty.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    NotFound:
-      description: The specified bucket or object does not exist.
       content:
         application/xml:
           schema:
@@ -180,17 +179,18 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/S3Error'
-  parameters:
-    bucket:
-      name: bucket
-      in: path
-      required: true
-      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 63
-        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
   securitySchemes:
     awsAuth:
       type: apiKey
