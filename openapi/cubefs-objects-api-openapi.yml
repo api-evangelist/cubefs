@@ -235,31 +235,7 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 components:
-  parameters:
-    bucket:
-      name: bucket
-      in: path
-      required: true
-      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 63
-        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
-    key:
-      name: key
-      in: path
-      required: true
-      description: Object key (path within the bucket). Use forward slashes to simulate directory hierarchies.
-      schema:
-        type: string
   responses:
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
     Unauthorized:
       description: Authentication credentials are missing, invalid, or the signature does not match.
       content:
@@ -272,29 +248,13 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
   schemas:
-    ObjectInfo:
-      type: object
-      description: Metadata about an object in a bucket.
-      properties:
-        Key:
-          type: string
-          description: Object key.
-        LastModified:
-          type: string
-          format: date-time
-          description: Timestamp when the object was last modified.
-        ETag:
-          type: string
-          description: MD5 hash of the object content.
-        Size:
-          type: integer
-          description: Size of the object in bytes.
-        StorageClass:
-          type: string
-          description: Storage class of the object.
-        Owner:
-          $ref: '#/components/schemas/Owner'
     Owner:
       type: object
       description: Owner of a bucket or object.
@@ -305,29 +265,6 @@ components:
         DisplayName:
           type: string
           description: Display name of the owner.
-    CommonPrefix:
-      type: object
-      description: Common prefix resulting from delimiter-based grouping.
-      properties:
-        Prefix:
-          type: string
-          description: The common prefix string.
-    S3Error:
-      type: object
-      description: S3-compatible error response in XML format.
-      properties:
-        Code:
-          type: string
-          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
-        Message:
-          type: string
-          description: Human-readable error message.
-        Resource:
-          type: string
-          description: The bucket or object that the error applies to.
-        RequestId:
-          type: string
-          description: Unique identifier for the request, useful for debugging.
     ListBucketResult:
       type: object
       description: Result of listing objects in a bucket.
@@ -360,6 +297,69 @@ components:
           description: List of common prefixes from delimiter grouping.
           items:
             $ref: '#/components/schemas/CommonPrefix'
+    S3Error:
+      type: object
+      description: S3-compatible error response in XML format.
+      properties:
+        Code:
+          type: string
+          description: S3 error code such as NoSuchBucket, InvalidBucketName, or BucketNotEmpty.
+        Message:
+          type: string
+          description: Human-readable error message.
+        Resource:
+          type: string
+          description: The bucket or object that the error applies to.
+        RequestId:
+          type: string
+          description: Unique identifier for the request, useful for debugging.
+    ObjectInfo:
+      type: object
+      description: Metadata about an object in a bucket.
+      properties:
+        Key:
+          type: string
+          description: Object key.
+        LastModified:
+          type: string
+          format: date-time
+          description: Timestamp when the object was last modified.
+        ETag:
+          type: string
+          description: MD5 hash of the object content.
+        Size:
+          type: integer
+          description: Size of the object in bytes.
+        StorageClass:
+          type: string
+          description: Storage class of the object.
+        Owner:
+          $ref: '#/components/schemas/Owner'
+    CommonPrefix:
+      type: object
+      description: Common prefix resulting from delimiter-based grouping.
+      properties:
+        Prefix:
+          type: string
+          description: The common prefix string.
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+    key:
+      name: key
+      in: path
+      required: true
+      description: Object key (path within the bucket). Use forward slashes to simulate directory hierarchies.
+      schema:
+        type: string
   securitySchemes:
     awsAuth:
       type: apiKey

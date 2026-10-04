@@ -142,6 +142,25 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
   parameters:
     bucket:
       name: bucket
@@ -160,48 +179,7 @@ components:
       description: Object key (path within the bucket). Use forward slashes to simulate directory hierarchies.
       schema:
         type: string
-  responses:
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    NotFound:
-      description: The specified bucket or object does not exist.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
   schemas:
-    InitiateMultipartUploadResult:
-      type: object
-      description: Result of initiating a multipart upload.
-      properties:
-        Bucket:
-          type: string
-          description: Name of the bucket.
-        Key:
-          type: string
-          description: Object key for the multipart upload.
-        UploadId:
-          type: string
-          description: Unique identifier for this multipart upload session.
-    CompleteMultipartUpload:
-      type: object
-      description: Request body for completing a multipart upload.
-      properties:
-        Part:
-          type: array
-          description: Ordered list of parts to assemble into the final object.
-          items:
-            $ref: '#/components/schemas/CompletedPart'
     CompletedPart:
       type: object
       description: A part to include when completing a multipart upload.
@@ -217,22 +195,6 @@ components:
         ETag:
           type: string
           description: ETag returned when the part was uploaded.
-    CompleteMultipartUploadResult:
-      type: object
-      description: Result of completing a multipart upload.
-      properties:
-        Location:
-          type: string
-          description: URL of the newly created object.
-        Bucket:
-          type: string
-          description: Name of the bucket.
-        Key:
-          type: string
-          description: Key of the assembled object.
-        ETag:
-          type: string
-          description: ETag of the completed object.
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -249,6 +211,44 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
+    CompleteMultipartUploadResult:
+      type: object
+      description: Result of completing a multipart upload.
+      properties:
+        Location:
+          type: string
+          description: URL of the newly created object.
+        Bucket:
+          type: string
+          description: Name of the bucket.
+        Key:
+          type: string
+          description: Key of the assembled object.
+        ETag:
+          type: string
+          description: ETag of the completed object.
+    CompleteMultipartUpload:
+      type: object
+      description: Request body for completing a multipart upload.
+      properties:
+        Part:
+          type: array
+          description: Ordered list of parts to assemble into the final object.
+          items:
+            $ref: '#/components/schemas/CompletedPart'
+    InitiateMultipartUploadResult:
+      type: object
+      description: Result of initiating a multipart upload.
+      properties:
+        Bucket:
+          type: string
+          description: Name of the bucket.
+        Key:
+          type: string
+          description: Object key for the multipart upload.
+        UploadId:
+          type: string
+          description: Unique identifier for this multipart upload session.
   securitySchemes:
     awsAuth:
       type: apiKey

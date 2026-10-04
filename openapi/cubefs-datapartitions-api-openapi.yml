@@ -98,18 +98,6 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
-    ErrorResponse:
-      type: object
-      description: Error response from the CubeFS Master API.
-      properties:
-        code:
-          type: integer
-          description: Error code. Non-200 values indicate failure.
-        msg:
-          type: string
-          description: Human-readable error message.
-        data:
-          description: Additional error context, may be null or empty.
     GeneralResponse:
       type: object
       description: General success response from the CubeFS Master API.
@@ -122,6 +110,18 @@ components:
           description: Response message, typically "success".
         data:
           description: Response data, content varies by operation.
+    ErrorResponse:
+      type: object
+      description: Error response from the CubeFS Master API.
+      properties:
+        code:
+          type: integer
+          description: Error code. Non-200 values indicate failure.
+        msg:
+          type: string
+          description: Human-readable error message.
+        data:
+          description: Additional error context, may be null or empty.
 externalDocs:
   description: CubeFS Master Admin API Reference
   url: https://cubefs.io/docs/master/dev-guide/admin-api/master/

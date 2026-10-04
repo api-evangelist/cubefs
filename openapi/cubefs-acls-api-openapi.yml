@@ -76,48 +76,26 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 components:
-  parameters:
-    bucket:
-      name: bucket
-      in: path
-      required: true
-      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
-      schema:
-        type: string
-        minLength: 3
-        maxLength: 63
-        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
+  responses:
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    NotFound:
+      description: The specified bucket or object does not exist.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
+      content:
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/S3Error'
   schemas:
-    AccessControlPolicy:
-      type: object
-      description: Access control policy for a bucket or object.
-      properties:
-        Owner:
-          $ref: '#/components/schemas/Owner'
-        AccessControlList:
-          type: object
-          description: Container for grant entries.
-          properties:
-            Grant:
-              type: array
-              description: List of access control grants.
-              items:
-                $ref: '#/components/schemas/Grant'
-    Grant:
-      type: object
-      description: A permission grant in an ACL.
-      properties:
-        Grantee:
-          $ref: '#/components/schemas/Grantee'
-        Permission:
-          type: string
-          enum:
-          - FULL_CONTROL
-          - READ
-          - WRITE
-          - READ_ACP
-          - WRITE_ACP
-          description: Permission level granted.
     Owner:
       type: object
       description: Owner of a bucket or object.
@@ -128,6 +106,19 @@ components:
         DisplayName:
           type: string
           description: Display name of the owner.
+    Grantee:
+      type: object
+      description: An entity to whom access is being granted.
+      properties:
+        ID:
+          type: string
+          description: User ID or group identifier.
+        DisplayName:
+          type: string
+          description: Display name of the grantee.
+        Type:
+          type: string
+          description: Type of grantee, typically CanonicalUser or Group.
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -144,38 +135,47 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
-    Grantee:
+    Grant:
       type: object
-      description: An entity to whom access is being granted.
+      description: A permission grant in an ACL.
       properties:
-        ID:
+        Grantee:
+          $ref: '#/components/schemas/Grantee'
+        Permission:
           type: string
-          description: User ID or group identifier.
-        DisplayName:
-          type: string
-          description: Display name of the grantee.
-        Type:
-          type: string
-          description: Type of grantee, typically CanonicalUser or Group.
-  responses:
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
-    NotFound:
-      description: The specified bucket or object does not exist.
-      content:
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/S3Error'
+          enum:
+          - FULL_CONTROL
+          - READ
+          - WRITE
+          - READ_ACP
+          - WRITE_ACP
+          description: Permission level granted.
+    AccessControlPolicy:
+      type: object
+      description: Access control policy for a bucket or object.
+      properties:
+        Owner:
+          $ref: '#/components/schemas/Owner'
+        AccessControlList:
+          type: object
+          description: Container for grant entries.
+          properties:
+            Grant:
+              type: array
+              description: List of access control grants.
+              items:
+                $ref: '#/components/schemas/Grant'
+  parameters:
+    bucket:
+      name: bucket
+      in: path
+      required: true
+      description: Name of the S3 bucket (corresponds to a CubeFS volume name).
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
   securitySchemes:
     awsAuth:
       type: apiKey
