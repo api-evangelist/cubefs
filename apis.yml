@@ -346,6 +346,9 @@ useCases:
   - name: Hot/Cold Tiering
     description: Replicated tier for hot data and erasure-coded tier for cold data.
 common:
+  - type: CapabilityMap
+    url: capabilities/cubefs-capability-edges.yml
+    name: CubeFS Business Capability Map
   - type: IssueTracker
     url: https://github.com/cubefs/cubefs/issues
   - type: Releases
