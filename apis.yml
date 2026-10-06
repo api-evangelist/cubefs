@@ -56,7 +56,7 @@ tags_raw:
 type: Index
 specificationVersion: '0.23'
 created: '2026-03-16'
-modified: '2026-05-19'
+modified: '2026-10-06'
 apis:
 - aid: cubefs:cubefs-buckets-api
   name: CubeFS Buckets API
@@ -346,6 +346,8 @@ useCases:
   - name: Hot/Cold Tiering
     description: Replicated tier for hot data and erasure-coded tier for cold data.
 common:
+  - url: https://cubefs.io/blog/
+    type: Blog
   - type: CapabilityMap
     url: capabilities/cubefs-capability-edges.yml
     name: CubeFS Business Capability Map
