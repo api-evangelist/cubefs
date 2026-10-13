@@ -1,0 +1,25 @@
+edges:
+- partner_name: Amazon Web Services
+  partner: amazon-web-services
+  partner_match: shape-anchor
+  channel: provider-built
+  relationship: compatible
+  direction: provider-built
+  shape: aws-s3
+  type: contract
+  degree: declared-unqualified
+  evidence: https://github.com/api-evangelist/cubefs/blob/main/openapi/cubefs-acls-api-openapi.yml#L3
+  evidence_kind: own-contract
+  quote: 'title: CubeFS S3-Compatible ACLs API'
+  structural_match:
+    file: cubefs/openapi/cubefs-objects-api-openapi.yml
+    ops:
+    - DeleteObject
+    - GetObject
+    - HeadObject
+    - ListObjects
+    - PutObject
+  detected_by: sweep-shape-compat.py
+  first_seen: '2026-10-13'
+generated: '2026-10-13'
+method: searched
