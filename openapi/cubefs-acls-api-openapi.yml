@@ -77,8 +77,8 @@ paths:
           $ref: '#/components/responses/NotFound'
 components:
   responses:
-    Unauthorized:
-      description: Authentication credentials are missing, invalid, or the signature does not match.
+    BadRequest:
+      description: The request was malformed or contained invalid parameters.
       content:
         application/xml:
           schema:
@@ -89,36 +89,13 @@ components:
         application/xml:
           schema:
             $ref: '#/components/schemas/S3Error'
-    BadRequest:
-      description: The request was malformed or contained invalid parameters.
+    Unauthorized:
+      description: Authentication credentials are missing, invalid, or the signature does not match.
       content:
         application/xml:
           schema:
             $ref: '#/components/schemas/S3Error'
   schemas:
-    Owner:
-      type: object
-      description: Owner of a bucket or object.
-      properties:
-        ID:
-          type: string
-          description: CubeFS user ID of the owner.
-        DisplayName:
-          type: string
-          description: Display name of the owner.
-    Grantee:
-      type: object
-      description: An entity to whom access is being granted.
-      properties:
-        ID:
-          type: string
-          description: User ID or group identifier.
-        DisplayName:
-          type: string
-          description: Display name of the grantee.
-        Type:
-          type: string
-          description: Type of grantee, typically CanonicalUser or Group.
     S3Error:
       type: object
       description: S3-compatible error response in XML format.
@@ -135,6 +112,19 @@ components:
         RequestId:
           type: string
           description: Unique identifier for the request, useful for debugging.
+    Grantee:
+      type: object
+      description: An entity to whom access is being granted.
+      properties:
+        ID:
+          type: string
+          description: User ID or group identifier.
+        DisplayName:
+          type: string
+          description: Display name of the grantee.
+        Type:
+          type: string
+          description: Type of grantee, typically CanonicalUser or Group.
     Grant:
       type: object
       description: A permission grant in an ACL.
@@ -150,6 +140,16 @@ components:
           - READ_ACP
           - WRITE_ACP
           description: Permission level granted.
+    Owner:
+      type: object
+      description: Owner of a bucket or object.
+      properties:
+        ID:
+          type: string
+          description: CubeFS user ID of the owner.
+        DisplayName:
+          type: string
+          description: Display name of the owner.
     AccessControlPolicy:
       type: object
       description: Access control policy for a bucket or object.
