@@ -1,4 +1,4 @@
-# CubeFS (cubefs)
+# CubeFS
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,89 +66,167 @@
 
 CubeFS is a CNCF graduated cloud-native distributed file system supporting POSIX, HDFS, and S3-compatible object storage protocols. It provides multi-tenancy, multi-AZ deployment, cross-region replication, and erasure coding for both hot and cold data tiers, and is widely used to back cloud-native AI training, big-data analytics, and container storage workloads.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/cubefs/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/cubefs/refs/heads/main/apis.yml)
+**Areas:** Cloud-Native · CNCF Graduated · Distributed File System · Kubernetes · Object Storage · POSIX · S3 Compatible · Storage
 
-## Scope
+## CubeFS on APIs.io
 
-- **Type:** Index
+Everything profiled for CubeFS is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/cubefs/](https://apis.io/providers/cubefs/)** — or go straight to one of the APIs or properties below.
 
-## Tags
+### APIs (11)
 
-- Cloud Native
-- CNCF Graduated
-- Distributed File System
-- Kubernetes
-- Object Storage
-- POSIX
-- S3 Compatible
-- Storage
+- [CubeFS Buckets API](https://apis.io/apis/cubefs/cubefs-buckets-api/) — Bucket-level operations including creating, listing, and deleting buckets. In CubeFS, each S3 bucket corresponds to a CubeFS volume. Bucket names must be…
+- [CubeFS Cluster API](https://apis.io/apis/cubefs/cubefs-cluster-api/) — Cluster-level operations including retrieving cluster status, topology, and freezing/unfreezing the cluster to control automatic partition creation.
+- [CubeFS DataPartitions API](https://apis.io/apis/cubefs/cubefs-datapartitions-api/) — Data partition management including creating, loading, decommissioning, and diagnosing data partitions within volumes.
+- [CubeFS MetaNodes API](https://apis.io/apis/cubefs/cubefs-metanodes-api/) — Metadata node management operations including listing nodes, querying node status, decommissioning nodes, and managing metadata partitions.
+- [CubeFS MetaPartitions API](https://apis.io/apis/cubefs/cubefs-metapartitions-api/) — Metadata partition management including creating, loading, and decommissioning metadata partitions within volumes.
+- [CubeFS Multipart API](https://apis.io/apis/cubefs/cubefs-multipart-api/) — Multipart upload operations for uploading large objects in parts. Supports initiating, uploading parts, listing parts, completing, and aborting multipart…
+- [CubeFS Objects API](https://apis.io/apis/cubefs/cubefs-objects-api/) — Object CRUD operations including uploading, downloading, copying, listing, and deleting objects. Supports both standard single-part uploads and multipart…
+- [CubeFS Users API](https://apis.io/apis/cubefs/cubefs-users-api/) — User and access control management for CubeFS multi-tenancy. Users own volumes and are assigned access keys and secret keys for S3-compatible object storage…
+- [CubeFS Volumes API](https://apis.io/apis/cubefs/cubefs-volumes-api/) — Volume lifecycle management operations including creating, updating, expanding, shrinking, and deleting volumes. Volumes are the top-level storage…
+- [CubeFS AC Ls API](https://apis.io/apis/cubefs/cubefs-acls-api/) — Access control list operations for buckets and objects. Supports getting and setting ACLs to control access at the bucket and object level.
+- [CubeFS Data Nodes API](https://apis.io/apis/cubefs/cubefs-data-nodes-api/) — Data node management operations including listing nodes, querying node status, decommissioning nodes, and managing data partitions on nodes.
 
-## Timestamps
+### Published properties
 
-- **Created:** 2026-03-16
-- **Modified:** 2026-05-19
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-## APIs
+#### Agentic access (1)
 
-### CubeFS S3-Compatible API
+Which operations an agent can call, which act, and which need a human in the loop.
 
-CubeFS exposes an S3-compatible object storage interface through its ObjectNode component. AWS S3 SDKs work without modification for bucket management, object CRUD, multipart uploads, and access control.
+- [Cubefs Agentic Access](https://apis.io/agentic-access/cubefs/cubefs-agentic-access/)
 
-- **Human URL:** [https://cubefs.io/docs/master/user-guide/objectnode.html](https://cubefs.io/docs/master/user-guide/objectnode.html)
+#### JSON Schema (1)
 
-#### Tags
+The data models the API reads and writes.
 
-- Compatible API
-- Object Storage
-- S3
+- [CubeFS Volume](https://apis.io/schemas/cubefs/cubefs-volume/)
 
-#### Properties
+#### JSON-LD (1)
 
-- [Documentation](https://cubefs.io/docs/master/user-guide/objectnode.html)
-- [GitHub Repository](https://github.com/cubefs/cubefs)
-- [OpenAPI](openapi/cubefs-s3-api-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/cubefs-s3-api.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/cubefs-s3-api.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-- [Spectral Rules](rules/cubefs-s3-rules.yml)
+Linked-data contexts for the provider's vocabulary.
 
-### CubeFS Master API
+- [Cubefs Context](https://apis.io/jsonld/cubefs/cubefs-context/)
 
-The CubeFS Master API provides HTTP endpoints for cluster management including volume creation/deletion, data and meta partition management, data and meta node management, user/policy management, and cluster status monitoring. It is the control plane interface for administering CubeFS clusters.
+#### Vocabulary (1)
 
-- **Human URL:** [https://cubefs.io/docs/master/dev-guide/master-api.html](https://cubefs.io/docs/master/dev-guide/master-api.html)
+The provider's domain terms, defined.
 
-#### Tags
+- [CubeFS Vocabulary](https://apis.io/vocabularies/cubefs/cubefs-vocabulary/)
 
-- Admin API
-- Cluster Management
-- Control Plane
+#### Collections (13)
 
-#### Properties
+Postman and Open Collection request collections.
 
-- [Documentation](https://cubefs.io/docs/master/dev-guide/master-api.html)
-- [GitHub Repository](https://github.com/cubefs/cubefs)
-- [OpenAPI](openapi/cubefs-master-api-openapi.yml) — [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
-- [Postman Collection](collections/cubefs-master-api.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/cubefs-master-api.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
-- [JSON Schema](json-schema/cubefs-volume-schema.json) — [JSON Schema](https://json-schema.org/specification)
-- [Spectral Rules](rules/cubefs-master-rules.yml)
+- [CubeFS Master ACLs API](https://apis.io/collections/cubefs/open-cubefs-acls-api/)
+- [CubeFS Master ACLs Buckets API](https://apis.io/collections/cubefs/open-cubefs-buckets-api/)
+- [CubeFS Master ACLs Cluster API](https://apis.io/collections/cubefs/open-cubefs-cluster-api/)
+- [CubeFS Master ACLs DataNodes API](https://apis.io/collections/cubefs/open-cubefs-datanodes-api/)
+- [CubeFS Master ACLs DataPartitions API](https://apis.io/collections/cubefs/open-cubefs-datapartitions-api/)
+- [CubeFS Master API](https://apis.io/collections/cubefs/open-cubefs-master-api/)
+- [CubeFS Master ACLs MetaNodes API](https://apis.io/collections/cubefs/open-cubefs-metanodes-api/)
+- [CubeFS Master ACLs MetaPartitions API](https://apis.io/collections/cubefs/open-cubefs-metapartitions-api/)
+- [CubeFS Master ACLs Multipart API](https://apis.io/collections/cubefs/open-cubefs-multipart-api/)
+- [CubeFS Master ACLs Objects API](https://apis.io/collections/cubefs/open-cubefs-objects-api/)
+- [CubeFS S3-Compatible API](https://apis.io/collections/cubefs/open-cubefs-s3-api/)
+- [CubeFS Master ACLs Users API](https://apis.io/collections/cubefs/open-cubefs-users-api/)
+- [CubeFS Master ACLs Volumes API](https://apis.io/collections/cubefs/open-cubefs-volumes-api/)
 
-## Common Properties
+#### Governance rules (3)
 
-- [JSON-LD](json-ld/cubefs-context.jsonld) — [JSON-LD](https://www.w3.org/TR/json-ld11/)
-- [JSON Schema](json-schema/cubefs-volume-schema.json) — [JSON Schema](https://json-schema.org/specification)
-- [Vocabulary](vocabulary/cubefs-vocabulary.yml)
-- [Spectral Rules](rules/cubefs-master-rules.yml)
-- [Spectral Rules](rules/cubefs-s3-rules.yml)
+Spectral rulesets for the provider's contracts.
+
+- [CubeFS — jsonschema rules](https://apis.io/rules/cubefs/cubefs-jsonschema-spectral-rules/)
+- [CubeFS — master rules](https://apis.io/rules/cubefs/cubefs-master-rules/)
+- [CubeFS — s3 rules](https://apis.io/rules/cubefs/cubefs-s3-rules/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Cubefs Authentication](https://apis.io/security/cubefs/cubefs-authentication/)
+- [Cubefs Domain Security](https://apis.io/security/cubefs/cubefs-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Cubefs Plans Pricing](https://apis.io/plans/cubefs/cubefs-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Cubefs Rate Limits](https://apis.io/rate-limits/cubefs/cubefs-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Cubefs Finops](https://apis.io/finops/cubefs/cubefs-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
 - [Website](https://cubefs.io/)
 - [Documentation](https://cubefs.io/docs/master/overview/introduction.html)
-- [Getting Started](https://cubefs.io/docs/master/quickstart/single-deploy.html)
+- [Getting started](https://cubefs.io/docs/master/quickstart/single-deploy.html)
 - [Changelog](https://github.com/cubefs/cubefs/blob/master/CHANGELOG.md)
-- [GitHub Organization](https://github.com/cubefs)
-- [GitHub Repository](https://github.com/cubefs/cubefs)
-- [L L Ms Txt](https://cubefs.io/llms.txt)
+- [Blog](https://cubefs.io/blog/)
+- [GitHub](https://github.com/cubefs)
 
-## Maintainers
+## API Evangelist rating
 
-**FN:** Kin Lane
-**Email:** kin@apievangelist.com
+**Kin Score 42.9** — developing · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 64.3 |
+| Contract quality | 53.9 |
+| Contract governance | 27.3 |
+| Operational transparency | 39.5 |
+| Developer ergonomics | 35.7 |
+| Access clarity | 7.9 |
+
+**Agent readiness 19.0** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | derived (partial credit) |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | bearer (partial credit) |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | derived (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | — |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 16.7** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/cubefs/](https://apis.io/providers/cubefs/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for CubeFS: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/cubefs/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
